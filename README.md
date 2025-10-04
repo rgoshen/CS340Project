@@ -31,6 +31,62 @@ This application streamlines the identification of rescue dog candidates for Gra
 
 Grazioso Salvare needed an efficient way to identify dogs with the right characteristics for search-and-rescue training from thousands of shelter animals across the Austin area. Manual review of shelter records was time-consuming and inconsistent. This system automates the candidate identification process, enabling trainers to quickly locate dogs that match specific rescue profiles—ultimately getting more qualified animals into life-saving training programs faster while giving shelter dogs a second chance at purposeful work.
 
+## CRUD Operations
+
+The CRUD Python module provides four essential database operations for managing animal shelter data:
+
+### Create Operation
+- **Purpose**: Insert new animal records into the MongoDB database
+- **Method**: `create(data: dict) -> bool`
+- **Returns**: `True` on successful insertion, `False` on failure
+- **Features**:
+  - Validates required `animal_id` field
+  - Prevents duplicate entries
+  - Comprehensive error handling
+
+### Read Operation
+- **Purpose**: Query and retrieve animal records from the database
+- **Method**: `read(query: dict) -> list`
+- **Returns**: List of matching documents, empty list if none found
+- **Features**:
+  - Flexible query filtering
+  - Returns all matching documents
+  - Proper cursor handling for efficient memory usage
+
+### Update Operation
+- **Purpose**: Modify existing animal records in the database
+- **Method**: `update(query: dict, update_data: dict) -> int`
+- **Returns**: Number of modified documents (modified_count)
+- **Features**:
+  - Auto-wraps update data in `$set` if no operator provided
+  - Supports all MongoDB update operators ($set, $inc, $push, etc.)
+  - Returns 0 on error or if no documents modified
+
+### Delete Operation
+- **Purpose**: Remove animal records from the database
+- **Method**: `delete(query: dict) -> int`
+- **Returns**: Number of deleted documents (deleted_count)
+- **Features**:
+  - Removes all documents matching query criteria
+  - Returns 0 on error or if no documents deleted
+  - Safe deletion with query validation
+
+## Why PyMongo?
+
+PyMongo was selected as the database driver for this project for the following reasons:
+
+1. **Official MongoDB Support**: PyMongo is the official MongoDB driver for Python, ensuring reliable compatibility and long-term support.
+
+2. **Comprehensive Feature Set**: Provides complete access to MongoDB's CRUD operations, aggregation framework, and advanced query capabilities.
+
+3. **Pythonic API**: Offers intuitive, Python-native interface that follows familiar dictionary and list patterns for working with documents.
+
+4. **Performance**: Implements connection pooling and efficient cursor management for optimal database performance.
+
+5. **Active Development**: Regular updates and maintenance from MongoDB Inc. ensure compatibility with latest MongoDB versions and Python releases.
+
+6. **Industry Standard**: Widely adopted in production environments with extensive documentation and community support.
+
 ## Getting Started
 
 To get a local copy of this CRUD module up and running, follow these simple steps:
@@ -172,10 +228,34 @@ query_dogs = {"animal_type": "Dog"}
 dog_results = shelter.read(query_dogs)
 print(f"Found {len(dog_results)} dog records")
 
-# Query for a specific animal by name
-query_name = {"name": "Buddy"}
-name_results = shelter.read(query_name)
-print(f"Animals named Buddy: {len(name_results)}")
+# Query for a specific animal by animal_id
+query_id = {"animal_id": "TestID001"}
+id_results = shelter.read(query_id)
+print(f"Found {len(id_results)} matching record(s)")
+
+# Example: Update animal records
+# Update a single field
+update_count = shelter.update(
+    {"animal_id": "TestID001"},
+    {"outcome_type": "Adoption"}
+)
+print(f"Updated {update_count} record(s)")
+
+# Update with explicit $set operator
+update_count = shelter.update(
+    {"animal_id": "TestID001"},
+    {"$set": {"location_lat": 30.2672}}
+)
+print(f"Updated {update_count} record(s)")
+
+# Example: Delete animal records
+# Delete a single record by animal_id
+delete_count = shelter.delete({"animal_id": "TestID001"})
+print(f"Deleted {delete_count} record(s)")
+
+# Delete multiple records by criteria
+delete_count = shelter.delete({"outcome_type": "Transfer"})
+print(f"Deleted {delete_count} transfer record(s)")
 ```
 
 ### Tests
@@ -207,9 +287,16 @@ print(f"Create test result: {create_result}")
 read_results = shelter.read({"animal_type": "Dog"})
 print(f"Read test found {len(read_results)} dog records")
 
-# Test with specific query
-name_query = shelter.read({"name": "Test Animal"})
-print(f"Found test animal: {len(name_query) > 0}")
+# Test Update functionality - modify a record
+update_count = shelter.update(
+    {"animal_id": "TEST001"},
+    {"outcome_type": "Adoption"}
+)
+print(f"Update test modified {update_count} record(s)")
+
+# Test Delete functionality - remove a record
+delete_count = shelter.delete({"animal_id": "TEST001"})
+print(f"Delete test removed {delete_count} record(s)")
 ```
 
 ### Screenshots
