@@ -43,8 +43,8 @@ class AnimalShelter(object):
         """
         Initialize MongoDB connection with authentication.
 
-        Establishes connection to localhost MongoDB instance using class constants
-        and connects to the 'aac' database 'animals' collection.
+        Establishes connection to localhost MongoDB instance using class
+        constants and connects to the 'aac' database 'animals' collection.
 
         Raises:
             ConnectionFailure: If unable to connect to MongoDB server
@@ -52,9 +52,10 @@ class AnimalShelter(object):
             ConfigurationError: If connection parameters are invalid
         """
         try:
-            # Build MongoDB connection string with authentication credentials
+            # Build MongoDB connection string with credentials
             connection_string = (
-                f'mongodb://{self._USER}:{self._PASS}@{self._HOST}:{self._PORT}'
+                f'mongodb://{self._USER}:{self._PASS}@'
+                f'{self._HOST}:{self._PORT}'
             )
 
             # Create MongoDB client connection with timeout settings
@@ -71,7 +72,7 @@ class AnimalShelter(object):
             # Access specific database instance from MongoDB server
             self.database = self.client[self._DB]
 
-            # Access specific collection within the database for CRUD operations
+            # Access specific collection within database for CRUD operations
             self.collection = self.database[self._COL]
 
             print(f"✓ Successfully connected to MongoDB database '{self._DB}'")
@@ -107,13 +108,15 @@ class AnimalShelter(object):
             return False
         return True
 
-    def _handle_database_error(self, operation: str, error: PyMongoError) -> None:
+    def _handle_database_error(
+        self, operation: str, error: PyMongoError
+    ) -> None:
         """
         Common error handling for database operations.
 
         Args:
             operation (str): The operation that failed
-            error (PyMongoError): The MongoDB-specific exception that occurred
+            error (PyMongoError): MongoDB-specific exception that occurred
         """
         print(f"{operation} operation failed: {error}")
 
@@ -121,8 +124,9 @@ class AnimalShelter(object):
         """
         Insert a document into the animals collection.
 
-        Validates required fields, checks for duplicates, and inserts animal data
-        into the MongoDB collection with comprehensive error handling.
+        Validates required fields, checks for duplicates, and inserts
+        animal data into MongoDB collection with comprehensive error
+        handling.
 
         Args:
             data (dict): Key/value pairs for document insertion. Must contain
@@ -139,7 +143,11 @@ class AnimalShelter(object):
 
         Example:
             >>> shelter = AnimalShelter()
-            >>> animal_data = {"animal_id": "A123", "name": "Rex", "animal_type": "Dog"}
+            >>> animal_data = {
+            ...     "animal_id": "A123",
+            ...     "name": "Rex",
+            ...     "animal_type": "Dog"
+            ... }
             >>> result = shelter.create(animal_data)
             >>> print(result)  # True
         """
@@ -148,14 +156,15 @@ class AnimalShelter(object):
             return False
 
         try:
-            # Extract animal_id from document for validation and duplicate checking
+            # Extract animal_id from document for validation and
+            # duplicate checking
             animal_id = data.get("animal_id")
             if not animal_id:
                 print("animal_id is required and cannot be empty")
                 return False
 
-            # MongoDB find_one() - checks for existing document with same animal_id
-            # Returns None if no document found, document dict if found
+            # MongoDB find_one() - checks for existing document with
+            # same animal_id. Returns None if not found, dict if found
             existing = self.collection.find_one({"animal_id": animal_id})
             if existing:
                 print(f"Animal with ID {animal_id} already exists")
@@ -186,8 +195,9 @@ class AnimalShelter(object):
         """
         Query documents from the animals collection.
 
-        Uses MongoDB find() method to retrieve documents matching the query
-        criteria and returns results as a Python list with proper cursor handling.
+        Uses MongoDB find() method to retrieve documents matching query
+        criteria and returns results as Python list with proper cursor
+        handling.
 
         Args:
             query (dict): Key/value lookup pairs for MongoDB find() operation.
@@ -214,11 +224,13 @@ class AnimalShelter(object):
 
         try:
             # MongoDB find() - returns cursor object for query results
-            # Cursor is iterable but not a list - allows efficient memory usage
+            # Cursor is iterable but not list - allows efficient memory
+            # usage
             cursor = self.collection.find(query)
 
             # Convert MongoDB cursor to Python list for easier handling
-            # This loads all results into memory - suitable for moderate result sets
+            # This loads all results into memory - suitable for
+            # moderate result sets
             results = list(cursor)
             return results
 
@@ -323,9 +335,8 @@ class AnimalShelter(object):
         collection and returns the count of deleted documents.
 
         Args:
-            query (dict): Key/value pairs to match documents for deletion.
-                         Example: {"animal_id": "A123456"}
-                         Example: {"animal_type": "Dog", "outcome_type": "Transfer"}
+            query (dict): Key/value pairs to match documents for
+                         deletion. Example: {"animal_id": "A123456"}
 
         Returns:
             int: Number of documents deleted (deleted_count).
