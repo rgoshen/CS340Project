@@ -231,3 +231,86 @@ class AnimalShelter(object):
         except Exception as error:
             print(f"Unexpected error during read: {error}")
             return []
+
+    def update(
+        self,
+        query: Optional[Dict[str, Any]],
+        update_data: Optional[Dict[str, Any]]
+    ) -> int:
+        """
+        Update documents in the animals collection.
+
+        Modifies documents matching the query criteria with the provided update
+        data. Automatically wraps update_data in $set operator if no MongoDB
+        operator is provided.
+
+        Args:
+            query (dict): Key/value pairs to match documents for update.
+                         Example: {"animal_type": "Dog", "breed": "Labrador"}
+            update_data (dict): Update operations to apply. Can include MongoDB
+                              operators ($set, $inc, $push, etc.) or plain
+                              key/value pairs (auto-wrapped in $set).
+                              Example: {"outcome_type": "Adoption"}
+                              Example: {"$set": {"outcome_type": "Adoption"}}
+
+        Returns:
+            int: Number of documents modified (modified_count).
+                 Returns 0 if no documents modified or on error.
+
+        Example:
+            >>> shelter = AnimalShelter()
+            >>> # Update without operator (auto-wrapped in $set)
+            >>> count = shelter.update(
+            ...     {"animal_id": "A123"},
+            ...     {"outcome_type": "Adoption"}
+            ... )
+            >>> print(count)  # 1
+            >>>
+            >>> # Update with explicit operator
+            >>> count = shelter.update(
+            ...     {"animal_type": "Dog"},
+            ...     {"$set": {"location_lat": 30.2672}}
+            ... )
+            >>> print(count)  # Number of dogs updated
+        """
+        # Validate query parameter
+        if not self._validate_input(query, "query"):
+            return 0
+
+        # Validate update_data parameter
+        if not self._validate_input(update_data, "update_data"):
+            return 0
+
+        try:
+            # Check if update_data contains MongoDB update operators
+            # Operators start with $ (e.g., $set, $inc, $push, $pull)
+            has_operator = any(
+                key.startswith('$') for key in update_data.keys()
+            )
+
+            # If no operator provided, wrap in $set for safety
+            # This prevents accidental document replacement
+            if not has_operator:
+                update_data = {"$set": update_data}
+
+            # MongoDB update_many() - modifies all documents matching query
+            # Returns UpdateResult object with modified_count attribute
+            result = self.collection.update_many(query, update_data)
+
+            # Return count of actually modified documents
+            # Note: matched_count may differ from modified_count if values
+            # are identical
+            return result.modified_count
+
+        except WriteError as error:
+            print(f"MongoDB write error during update: {error}")
+            return 0
+        except OperationFailure as error:
+            print(f"MongoDB update operation failed: {error}")
+            return 0
+        except PyMongoError as error:
+            self._handle_database_error("Update", error)
+            return 0
+        except Exception as error:
+            print(f"Unexpected error during update: {error}")
+            return 0
