@@ -314,3 +314,54 @@ class AnimalShelter(object):
         except Exception as error:
             print(f"Unexpected error during update: {error}")
             return 0
+
+    def delete(self, query: Optional[Dict[str, Any]]) -> int:
+        """
+        Delete documents from the animals collection.
+
+        Removes documents matching the query criteria from the MongoDB
+        collection and returns the count of deleted documents.
+
+        Args:
+            query (dict): Key/value pairs to match documents for deletion.
+                         Example: {"animal_id": "A123456"}
+                         Example: {"animal_type": "Dog", "outcome_type": "Transfer"}
+
+        Returns:
+            int: Number of documents deleted (deleted_count).
+                 Returns 0 if no documents deleted or on error.
+
+        Example:
+            >>> shelter = AnimalShelter()
+            >>> # Delete single document by animal_id
+            >>> count = shelter.delete({"animal_id": "A123"})
+            >>> print(count)  # 1
+            >>>
+            >>> # Delete multiple documents by criteria
+            >>> count = shelter.delete({"outcome_type": "Transfer"})
+            >>> print(count)  # Number of transfer records deleted
+        """
+        # Validate query parameter
+        if not self._validate_input(query, "query"):
+            return 0
+
+        try:
+            # MongoDB delete_many() - removes all documents matching query
+            # Returns DeleteResult object with deleted_count attribute
+            result = self.collection.delete_many(query)
+
+            # Return count of deleted documents
+            return result.deleted_count
+
+        except WriteError as error:
+            print(f"MongoDB write error during delete: {error}")
+            return 0
+        except OperationFailure as error:
+            print(f"MongoDB delete operation failed: {error}")
+            return 0
+        except PyMongoError as error:
+            self._handle_database_error("Delete", error)
+            return 0
+        except Exception as error:
+            print(f"Unexpected error during delete: {error}")
+            return 0
