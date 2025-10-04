@@ -3,6 +3,12 @@
 - [Grazioso Rescue Finder](#grazioso-rescue-finder)
   - [About the Project](#about-the-project)
   - [Motivation](#motivation)
+  - [CRUD Operations](#crud-operations)
+    - [Create Operation](#create-operation)
+    - [Read Operation](#read-operation)
+    - [Update Operation](#update-operation)
+    - [Delete Operation](#delete-operation)
+  - [Why PyMongo?](#why-pymongo)
   - [Getting Started](#getting-started)
   - [Quick Start](#quick-start)
   - [Installation](#installation)
@@ -20,6 +26,16 @@
       - [Read Operation – Find Record](#read-operation--find-record)
       - [Read Operation – Empty Result](#read-operation--empty-result)
       - [Read Operation – Error Handling](#read-operation--error-handling)
+      - [Update Operation with Valid Query and Update Data (Explicit $set)](#update-operation-with-valid-query-and-update-data-explicit-set)
+      - [Update Operation without Operator (Auto-wrap in $set)](#update-operation-without-operator-auto-wrap-in-set)
+      - [Update Operation with None Query (Error Handling Test)](#update-operation-with-none-query-error-handling-test)
+      - [Update Operation with None Update Data (Error Handling Test)](#update-operation-with-none-update-data-error-handling-test)
+      - [Update Operation with Non-Matching Query (No Documents Modified)](#update-operation-with-non-matching-query-no-documents-modified)
+      - [Delete Operation with Valid Query](#delete-operation-with-valid-query)
+      - [Delete Operation with None Query (Error Handling Test)](#delete-operation-with-none-query-error-handling-test)
+      - [Delete Operation with Non-Matching Query (No Documents Deleted)](#delete-operation-with-non-matching-query-no-documents-deleted)
+      - [Delete Multiple Documents](#delete-multiple-documents)
+      - [Test Teardown - Cleanup Test Data](#test-teardown---cleanup-test-data)
   - [Roadmap/Features (Optional)](#roadmapfeatures-optional)
   - [Contact](#contact)
 
@@ -29,13 +45,14 @@ This application streamlines the identification of rescue dog candidates for Gra
 
 ## Motivation
 
-Grazioso Salvare needed an efficient way to identify dogs with the right characteristics for search-and-rescue training from thousands of shelter animals across the Austin area. Manual review of shelter records was time-consuming and inconsistent. This system automates the candidate identification process, enabling trainers to quickly locate dogs that match specific rescue profiles—ultimately getting more qualified animals into life-saving training programs faster while giving shelter dogs a second chance at purposeful work.
+Grazioso Salvare needs an efficient way to identify dogs with the right characteristics for search-and-rescue training from thousands of shelter animals across the Austin area. Manual review of shelter records is time-consuming and inconsistent. This system automates the candidate identification process, enabling trainers to quickly locate dogs that match specific rescue profiles—ultimately getting more qualified animals into life-saving training programs faster while giving shelter dogs a second chance at purposeful work.
 
 ## CRUD Operations
 
 The CRUD Python module provides four essential database operations for managing animal shelter data:
 
 ### Create Operation
+
 - **Purpose**: Insert new animal records into the MongoDB database
 - **Method**: `create(data: dict) -> bool`
 - **Returns**: `True` on successful insertion, `False` on failure
@@ -45,6 +62,7 @@ The CRUD Python module provides four essential database operations for managing 
   - Comprehensive error handling
 
 ### Read Operation
+
 - **Purpose**: Query and retrieve animal records from the database
 - **Method**: `read(query: dict) -> list`
 - **Returns**: List of matching documents, empty list if none found
@@ -54,6 +72,7 @@ The CRUD Python module provides four essential database operations for managing 
   - Proper cursor handling for efficient memory usage
 
 ### Update Operation
+
 - **Purpose**: Modify existing animal records in the database
 - **Method**: `update(query: dict, update_data: dict) -> int`
 - **Returns**: Number of modified documents (modified_count)
@@ -63,6 +82,7 @@ The CRUD Python module provides four essential database operations for managing 
   - Returns 0 on error or if no documents modified
 
 ### Delete Operation
+
 - **Purpose**: Remove animal records from the database
 - **Method**: `delete(query: dict) -> int`
 - **Returns**: Number of deleted documents (deleted_count)
@@ -170,13 +190,13 @@ The following tools and libraries are required to use this CRUD Python module:
 
 ```bash
 # Create a virtual environment
-python3 -m venv  .venv  	# macos or linux
-python -m venv .venv		# windows
+python3 -m venv  .venv            # macos or linux
+python -m venv .venv.             # windows
 
 # Activate the virtual environment
-source .venv/bin/activate	# macos or linux
-.\.venv\Scripts\Activate.ps1	# windows (PowerShell)
-.venv\Script\activate.bat	# windows (cmd.exe)
+source .venv/bin/activate.        # macos or linux
+.\.venv\Scripts\Activate.ps1.     # windows (PowerShell)
+.venv\Script\activate.bat.        # windows (cmd.exe)
 
 # Install project requirements
 pip3 install -r requirements.txt
@@ -333,16 +353,53 @@ print(f"Delete test removed {delete_count} record(s)")
 
 ![Read Operation – Error Handling](./screenshots/read_operation_3.jpg)
 
+#### Update Operation with Valid Query and Update Data (Explicit $set)
+
+![Update Operation with Valid Query and Update Data (Explicit $set)](./screenshots/update_operation_1.jpg)
+
+#### Update Operation without Operator (Auto-wrap in $set)
+
+![Update Operation without Operator (Auto-wrap in $set)](./screenshots/update_operation_2.jpg)
+
+#### Update Operation with None Query (Error Handling Test)
+
+![Update Operation with None Query (Error Handling Test)](./screenshots/update_operation_3.jpg)
+
+#### Update Operation with None Update Data (Error Handling Test)
+
+![Update Operation with None Update Data (Error Handling Test)](./screenshots/update_operation_4.jpg)
+
+#### Update Operation with Non-Matching Query (No Documents Modified)
+
+![Update Operation with Non-Matching Query (No Documents Modified)](./screenshots/update_operation_5.jpg)
+
+#### Delete Operation with Valid Query
+
+![Delete Operation with Valid Query](./screenshots/delete_operation_1.jpg)
+
+#### Delete Operation with None Query (Error Handling Test)
+
+![Delete Operation with None Query (Error Handling Test)](./screenshots/delete_operation_2.jpg)
+
+#### Delete Operation with Non-Matching Query (No Documents Deleted)
+
+![Delete Operation with Non-Matching Query (No Documents Deleted)](./screenshots/delete_operation_3.jpg)
+
+#### Delete Multiple Documents
+
+![Delete Multiple Documents](./screenshots/delete_operation_4.jpg)
+
+#### Test Teardown - Cleanup Test Data
+
+![Test Teardown - Cleanup Test Data](./screenshots/test_teardown.jpg)
+
 ## Roadmap/Features (Optional)
 
-*Provide an open issues list of proposed features (and known issues). If
-you have ideas for releases in the future, it is a good idea to list
-them in the README. What makes your project stand out?\
-\
-Note: This section is optional for the purposes of this assignment. If
-you choose not to fill out this section, remove it from your final
-README file.*
+- Dashboard
+  - Interactive data table
+  - Geolocation chart
 
 ## Contact
 
-Your name:
+Your name: Rick Goshen
+Email: [richard.goshen@snhu.edu](mailto: richard.goshen@snhu.edu)
