@@ -393,7 +393,7 @@ print(f"Delete test removed {delete_count} record(s)")
 
 ![Test Teardown - Cleanup Test Data](./screenshots/test_teardown.jpg)
 
-## Roadmap/Features (Optional)
+## Roadmap/Features
 
 - Dashboard
   - Interactive data table
