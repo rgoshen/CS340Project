@@ -104,7 +104,7 @@ To get a local copy of this CRUD module up and running, follow these simple step
 
         ```bash
         cd ./datasets
-        mongoimport –type=csv –headliner –db aac –collection animals –drop ./aac_shelter_outcomes.csv
+        mongoimport --type=csv --headerline --db aac --collection animals --drop ./aac_shelter_outcomes.csv
         ```
 
     2. Create Database User:
@@ -113,9 +113,9 @@ To get a local copy of this CRUD module up and running, follow these simple step
         mongosh
         use admin
         db.createUser({
-            user: “aacuser”,
-            pwd: paswordPrompt(),
-            roles: [{role: “readWrite”, db: “aac”}]
+            user: "aacuser",
+            pwd: passwordPrompt(),
+            roles: [{role: "readWrite", db: "aac"}]
             });
         ```
 
@@ -127,7 +127,7 @@ To get a local copy of this CRUD module up and running, follow these simple step
 
 ## Quick Start
 
-1. Download the CRUD_Python_Module.py, requirements.txt and ModuleFourTestScript.ipynb files to your local development environment
+1. Download the CRUD_Python_Module.py, requirements.txt and ProjectOneTestScript.ipynb files to your local development environment
 2. Install required dependencies:
 
     ```bash
@@ -140,7 +140,7 @@ To get a local copy of this CRUD module up and running, follow these simple step
     jupyter notebook
     ```
 
-4. Double click on the ModuleFourTestScript.ipynb and run all the cells in order.
+4. Double click on the ProjectOneTestScript.ipynb and run all the cells in order.
 
 That's it! You now have a working CRUD module ready for animal shelter data operations.
 
@@ -200,7 +200,6 @@ shelter = AnimalShelter()
 
 # Example: Create a new animal record
 new_animal = {
-test_animal = {
     "rec_num": "99999",
     "age_upon_outcome": "2 years",
     "animal_id": "TestID001",
@@ -218,6 +217,7 @@ test_animal = {
     "location_long": -97.7431,
     "age_upon_outcome_in_weeks": 104.0
 }
+
 # Insert the new record
 create_result = shelter.create(new_animal)
 print(f"Create operation successful: {create_result}")
@@ -260,7 +260,7 @@ print(f"Deleted {delete_count} transfer record(s)")
 
 ### Tests
 
-Testing for this CRUD module is performed using the provided ModuleFourTestScript.ipynb Jupyter Notebook. The testing approach follows the Module Four Milestone requirements:
+Testing for this CRUD module is performed using the provided ProjectOneTestScript.ipynb Jupyter Notebook. The test suite includes comprehensive coverage of all CRUD operations:
 
 Test Script Example:
 
