@@ -22,8 +22,9 @@ class AnimalShelter(object):
     """
     CRUD operations for Animal collection in MongoDB.
 
-    Provides create and read functionality for Austin Animal Center database
-    with comprehensive error handling and industry-standard best practices.
+    Provides complete Create, Read, Update, and Delete functionality for
+    Austin Animal Center database with comprehensive error handling and
+    industry-standard best practices.
 
     Attributes:
         client: MongoDB client connection
