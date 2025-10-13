@@ -40,7 +40,7 @@ class AnimalShelter(object):
     _DB = 'aac'
     _COL = 'animals'
 
-    def __init__(self) -> None:
+    def __init__(self, username: str = None, password: str = None) -> None:
         """
         Initialize MongoDB connection with authentication.
 
@@ -52,10 +52,15 @@ class AnimalShelter(object):
             ServerSelectionTimeoutError: If MongoDB server is unreachable
             ConfigurationError: If connection parameters are invalid
         """
+
+        # Use provided credentials or fall back to class constants
+        user = username if username else self._USER
+        pwd = password if password else self._PASS
+
         try:
             # Build MongoDB connection string with credentials
             connection_string = (
-                f'mongodb://{self._USER}:{self._PASS}@'
+                f'mongodb://{user}:{pwd}@'
                 f'{self._HOST}:{self._PORT}'
             )
 
