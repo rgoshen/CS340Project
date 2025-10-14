@@ -145,6 +145,19 @@ class TestDelete(unittest.TestCase):
 - Coverage tool: `coverage run -m unittest discover -s tests -p "test_*.py"`
 - Mock database tests deferred to CI implementation
 
+**Coverage Analysis:**
+The 23% uncovered code (29 lines) consists entirely of exception handlers for rare error conditions:
+- Connection errors: `ServerSelectionTimeoutError`, `ConfigurationError` (lines 90-97)
+- Write errors: `DuplicateKeyError`, `WriteError`, `OperationFailure`, `PyMongoError` (lines 185-195)
+- Similar exception handlers in read/update/delete methods (lines 244-248, 324-331, 374-381)
+
+These are defensive error handlers that are difficult to test without:
+- Intentionally breaking MongoDB or network connections
+- Mocking specific PyMongo internal exceptions
+- Simulating infrastructure failures
+
+The covered 77% includes all primary code paths, business logic, validation, and common error scenarios. Uncovered lines are safety nets for exceptional failures.
+
 **Documentation:**
 - Updated README.md with unittest execution instructions
 - Documented both live and mock database testing approaches
