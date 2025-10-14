@@ -155,10 +155,11 @@ All CRUD operations implemented, tested, and documented according to requirement
 - [x] Merge testing infrastructure to main (PR #12)
 - [x] Create feature/phase0-ci-setup branch
 - [x] Commit CI/CD configuration changes incrementally
-- [ ] Configure GitHub Secrets in repository settings
-  - [ ] Add MONGODB_USER secret (e.g., aacuser)
-  - [ ] Add MONGODB_PASSWORD secret (e.g., SNHU1234)
-- [ ] Verify CI passes after secrets configured
+- [x] Configure GitHub Secrets in repository settings
+  - [x] Add MONGODB_USER secret (e.g., aacuser)
+  - [x] Add MONGODB_PASSWORD secret (e.g., SNHU1234)
+- [x] Install mongosh in CI workflows
+- [ ] Verify CI passes after mongosh installation
 - [ ] Merge CI/CD setup to main (PR #13)
 - [ ] Ensure CI is green before proceeding to dashboard work
 
