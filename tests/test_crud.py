@@ -6,14 +6,14 @@ edge cases, and error conditions.
 """
 
 import unittest
+
 from tests.fixtures.test_data import (
-    BaseTestCase,
-    SAMPLE_ANIMAL_DATA,
-    SAMPLE_ANIMAL_DATA_2,
     EMPTY_ID_DATA,
     EMPTY_OBJECT,
     QUERY_SAMPLES,
-    UPDATE_SAMPLES
+    SAMPLE_ANIMAL_DATA,
+    UPDATE_SAMPLES,
+    BaseTestCase,
 )
 
 
