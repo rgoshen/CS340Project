@@ -286,9 +286,12 @@ Testing for this CRUD module is performed using both:
 
 #### Running Unit Tests
 
-The project includes a comprehensive unittest suite with 17 tests covering all CRUD operations:
+The project includes a comprehensive unittest suite with 29 tests covering all CRUD operations:
 
+**With Live MongoDB Database (default):**
 ```bash
+# Requires MongoDB running on localhost:27017 with aacuser credentials
+
 # Run all tests
 python -m unittest discover -s tests -p "test_*.py"
 
@@ -305,17 +308,39 @@ python -m unittest tests.test_crud.TestCreate
 python -m unittest tests.test_crud.TestCreate.test_create_with_valid_data
 ```
 
+**With Mock Database (for CI/offline testing):**
+```bash
+# No MongoDB connection required - uses mocked database
+
+# Run all tests with mock
+USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py"
+
+# Run with verbose output
+USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py" -v
+```
+*Note: Mock database testing is currently in development. All 29 tests pass with live MongoDB.*
+
 **Test Structure:**
-- `tests/test_crud.py` - All CRUD operation tests (Create, Read, Update, Delete)
-- `tests/test_authentication.py` - Authentication and connection tests (coming soon)
-- `tests/test_error_handling.py` - Error handling and edge case tests (coming soon)
+- `tests/test_crud.py` - All CRUD operation tests (17 tests: Create, Read, Update, Delete)
+- `tests/test_authentication.py` - Authentication and connection tests (4 tests)
+- `tests/test_error_handling.py` - Error handling and edge case tests (8 tests)
 - `tests/fixtures/test_data.py` - Shared test data and base test classes
 
-**Using Mock Database (for CI/offline testing):**
+**Total: 29 tests, all passing**
+
+**Test Coverage:**
 ```bash
-# Run tests without live MongoDB connection
-USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py"
+# Run tests with coverage analysis
+pip install coverage
+coverage run -m unittest discover -s tests -p "test_*.py"
+coverage report -m CRUD_Python_Module.py
+
+# Generate HTML coverage report
+coverage html
+# Open htmlcov/index.html in browser
 ```
+
+**Current Coverage: 77%** of CRUD_Python_Module.py
 
 #### Interactive Test Script Example
 
