@@ -67,3 +67,60 @@ def parse_age_to_weeks(age_str: Optional[str]) -> Optional[float]:
             return value / 7.0
         case _:
             return None
+
+
+def normalize_sex_intact(
+    sex_upon_outcome: Optional[str]
+) -> tuple[str, str]:
+    """Parse sex_upon_outcome into separate sex and intact status.
+
+    Extracts sex (Male/Female) and intact status (Intact/Neutered/Spayed)
+    from combined shelter data strings like "Neutered Male", "Intact Female".
+
+    Args:
+        sex_upon_outcome: Combined sex and status (e.g., "Neutered Male")
+
+    Returns:
+        Tuple of (sex, intact_status):
+        - sex: "Male", "Female", or "Unknown"
+        - intact_status: "Intact", "Neutered", "Spayed", or "Unknown"
+
+    Examples:
+        >>> normalize_sex_intact("Neutered Male")
+        ('Male', 'Neutered')
+        >>> normalize_sex_intact("Intact Female")
+        ('Female', 'Intact')
+        >>> normalize_sex_intact("Spayed Female")
+        ('Female', 'Spayed')
+        >>> normalize_sex_intact(None)
+        ('Unknown', 'Unknown')
+        >>> normalize_sex_intact("Unknown")
+        ('Unknown', 'Unknown')
+    """
+    if sex_upon_outcome is None or not isinstance(sex_upon_outcome, str):
+        return ('Unknown', 'Unknown')
+
+    sex_upon_outcome = sex_upon_outcome.strip().lower()
+
+    if not sex_upon_outcome or sex_upon_outcome == 'unknown':
+        return ('Unknown', 'Unknown')
+
+    # Initialize defaults
+    sex = 'Unknown'
+    intact_status = 'Unknown'
+
+    # Determine sex
+    if 'male' in sex_upon_outcome and 'female' not in sex_upon_outcome:
+        sex = 'Male'
+    elif 'female' in sex_upon_outcome:
+        sex = 'Female'
+
+    # Determine intact status
+    if 'neutered' in sex_upon_outcome:
+        intact_status = 'Neutered'
+    elif 'spayed' in sex_upon_outcome:
+        intact_status = 'Spayed'
+    elif 'intact' in sex_upon_outcome:
+        intact_status = 'Intact'
+
+    return (sex, intact_status)
