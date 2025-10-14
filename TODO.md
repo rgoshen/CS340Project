@@ -202,12 +202,13 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Implement deterministic tie-breaking (alphabetical)
   - [x] Make N configurable parameter
   - [x] Write 9 comprehensive unit tests (all passing)
-- [ ] Create normalize_dataframe() function (deferred to Phase 2)
-  - [ ] Apply age parsing to create age_weeks column
-  - [ ] Apply sex/intact normalization
-  - [ ] Apply coordinate validation to create valid_coords flag
-  - [ ] Cache normalized DataFrame at module level
-  - [ ] Add error handling for missing columns
+- [x] Create normalize_dataframe() function (deferred to Phase 2)
+  - [x] Apply age parsing to create age_weeks column
+  - [x] Apply sex/intact normalization to create sex and intact_status columns
+  - [x] Apply coordinate validation to create valid_coords flag
+  - [x] Add error handling for missing columns
+  - [x] Write 10 comprehensive unit tests (all passing)
+  - [ ] Cache normalized DataFrame at module level (deferred to dashboard implementation)
 
 ## Phase 2: Rescue Type Filter Logic
 - [ ] Implement water_rescue_filter() function
