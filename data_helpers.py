@@ -175,3 +175,89 @@ def validate_coordinates(
 
     except (TypeError, ValueError):
         return False
+
+
+def breed_matches_rescue_type(
+    breed: Optional[str],
+    rescue_type: str
+) -> bool:
+    """Check if breed matches rescue type requirements.
+
+    Determines if an animal's breed is suitable for a specific rescue type
+    (water, mountain, disaster, tracking) based on breed requirements.
+
+    Args:
+        breed: Animal breed string (may include multiple breeds)
+        rescue_type: Type of rescue ("water", "mountain", "disaster", "tracking")
+
+    Returns:
+        True if breed matches rescue type requirements, False otherwise
+
+    Rescue Type Breed Requirements:
+        - water: Labrador Retriever Mix, Chesapeake Bay Retriever, Newfoundland
+        - mountain: German Shepherd, Alaskan Malamute, Old English Sheepdog,
+                   Siberian Husky, Rottweiler
+        - disaster: Doberman Pinscher, German Shepherd, Golden Retriever,
+                    Bloodhound, Rottweiler
+        - tracking: (same as disaster)
+
+    Examples:
+        >>> breed_matches_rescue_type("Labrador Retriever Mix", "water")
+        True
+        >>> breed_matches_rescue_type("German Shepherd", "mountain")
+        True
+        >>> breed_matches_rescue_type("Poodle", "water")
+        False
+        >>> breed_matches_rescue_type(None, "water")
+        False
+    """
+    if breed is None or not isinstance(breed, str):
+        return False
+
+    breed = breed.strip().lower()
+
+    if not breed:
+        return False
+
+    rescue_type = rescue_type.strip().lower()
+
+    # Define breed requirements for each rescue type
+    water_breeds = {
+        'labrador retriever',
+        'chesapeake bay retriever',
+        'newfoundland'
+    }
+
+    mountain_breeds = {
+        'german shepherd',
+        'alaskan malamute',
+        'old english sheepdog',
+        'siberian husky',
+        'rottweiler'
+    }
+
+    disaster_breeds = {
+        'doberman pinscher',
+        'german shepherd',
+        'golden retriever',
+        'bloodhound',
+        'rottweiler'
+    }
+
+    # Select appropriate breed set based on rescue type
+    match rescue_type:
+        case 'water':
+            target_breeds = water_breeds
+        case 'mountain':
+            target_breeds = mountain_breeds
+        case 'disaster' | 'tracking':
+            target_breeds = disaster_breeds
+        case _:
+            return False
+
+    # Check if any target breed is in the animal's breed string
+    for target_breed in target_breeds:
+        if target_breed in breed:
+            return True
+
+    return False

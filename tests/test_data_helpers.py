@@ -3,6 +3,7 @@
 import unittest
 
 from data_helpers import (
+    breed_matches_rescue_type,
     normalize_sex_intact,
     parse_age_to_weeks,
     validate_coordinates,
@@ -272,6 +273,78 @@ class TestValidateCoordinates(unittest.TestCase):
         self.assertTrue(validate_coordinates(-90, -180))
         self.assertTrue(validate_coordinates(90, -180))
         self.assertTrue(validate_coordinates(-90, 180))
+
+
+class TestBreedMatchesRescueType(unittest.TestCase):
+    """Test cases for breed_matches_rescue_type function."""
+
+    def test_water_rescue_exact_match(self):
+        """Test water rescue with exact breed matches."""
+        self.assertTrue(breed_matches_rescue_type("Labrador Retriever", "water"))
+        self.assertTrue(breed_matches_rescue_type("Chesapeake Bay Retriever", "water"))
+        self.assertTrue(breed_matches_rescue_type("Newfoundland", "water"))
+
+    def test_water_rescue_mix(self):
+        """Test water rescue with mixed breeds."""
+        self.assertTrue(breed_matches_rescue_type("Labrador Retriever Mix", "water"))
+        self.assertTrue(breed_matches_rescue_type("Labrador Retriever/Pit Bull", "water"))
+
+    def test_mountain_rescue_breeds(self):
+        """Test mountain rescue breed matches."""
+        self.assertTrue(breed_matches_rescue_type("German Shepherd", "mountain"))
+        self.assertTrue(breed_matches_rescue_type("Alaskan Malamute", "mountain"))
+        self.assertTrue(breed_matches_rescue_type("Old English Sheepdog", "mountain"))
+        self.assertTrue(breed_matches_rescue_type("Siberian Husky", "mountain"))
+        self.assertTrue(breed_matches_rescue_type("Rottweiler", "mountain"))
+
+    def test_disaster_rescue_breeds(self):
+        """Test disaster rescue breed matches."""
+        self.assertTrue(breed_matches_rescue_type("Doberman Pinscher", "disaster"))
+        self.assertTrue(breed_matches_rescue_type("German Shepherd", "disaster"))
+        self.assertTrue(breed_matches_rescue_type("Golden Retriever", "disaster"))
+        self.assertTrue(breed_matches_rescue_type("Bloodhound", "disaster"))
+        self.assertTrue(breed_matches_rescue_type("Rottweiler", "disaster"))
+
+    def test_tracking_same_as_disaster(self):
+        """Test tracking uses same breeds as disaster."""
+        self.assertTrue(breed_matches_rescue_type("Bloodhound", "tracking"))
+        self.assertTrue(breed_matches_rescue_type("German Shepherd", "tracking"))
+
+    def test_case_insensitive(self):
+        """Test case-insensitive breed matching."""
+        self.assertTrue(breed_matches_rescue_type("LABRADOR RETRIEVER", "water"))
+        self.assertTrue(breed_matches_rescue_type("labrador retriever", "water"))
+        self.assertTrue(breed_matches_rescue_type("Labrador Retriever", "WATER"))
+
+    def test_multi_breed_with_separators(self):
+        """Test multi-breed strings with various separators."""
+        self.assertTrue(breed_matches_rescue_type("Labrador Retriever/Pit Bull", "water"))
+        self.assertTrue(breed_matches_rescue_type("German Shepherd Mix", "mountain"))
+
+    def test_non_matching_breed(self):
+        """Test breeds that don't match rescue type."""
+        self.assertFalse(breed_matches_rescue_type("Poodle", "water"))
+        self.assertFalse(breed_matches_rescue_type("Chihuahua", "mountain"))
+        self.assertFalse(breed_matches_rescue_type("Beagle", "disaster"))
+
+    def test_none_breed(self):
+        """Test None breed returns False."""
+        self.assertFalse(breed_matches_rescue_type(None, "water"))
+
+    def test_empty_breed(self):
+        """Test empty breed returns False."""
+        self.assertFalse(breed_matches_rescue_type("", "water"))
+        self.assertFalse(breed_matches_rescue_type("   ", "water"))
+
+    def test_invalid_rescue_type(self):
+        """Test invalid rescue type returns False."""
+        self.assertFalse(breed_matches_rescue_type("Labrador Retriever", "invalid"))
+        self.assertFalse(breed_matches_rescue_type("German Shepherd", "unknown"))
+
+    def test_non_string_breed(self):
+        """Test non-string breed returns False."""
+        self.assertFalse(breed_matches_rescue_type(123, "water"))
+        self.assertFalse(breed_matches_rescue_type([], "water"))
 
 
 if __name__ == '__main__':
