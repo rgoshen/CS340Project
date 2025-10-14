@@ -6,10 +6,9 @@ animal shelter data for use in the dashboard and rescue type filtering.
 
 import re
 from collections import Counter
-from typing import Optional
 
 
-def parse_age_to_weeks(age_str: Optional[str]) -> Optional[float]:
+def parse_age_to_weeks(age_str: str | None) -> float | None:
     """Parse age string to numeric weeks.
 
     Converts age strings like "2 years", "6 months", "3 weeks", "14 days"
@@ -71,7 +70,7 @@ def parse_age_to_weeks(age_str: Optional[str]) -> Optional[float]:
 
 
 def normalize_sex_intact(
-    sex_upon_outcome: Optional[str]
+    sex_upon_outcome: str | None
 ) -> tuple[str, str]:
     """Parse sex_upon_outcome into separate sex and intact status.
 
@@ -128,8 +127,8 @@ def normalize_sex_intact(
 
 
 def validate_coordinates(
-    location_lat: Optional[float | str],
-    location_long: Optional[float | str]
+    location_lat: float | str | None,
+    location_long: float | str | None
 ) -> bool:
     """Validate geographic coordinates.
 
@@ -169,17 +168,14 @@ def validate_coordinates(
         if lat < -90 or lat > 90:
             return False
 
-        if lon < -180 or lon > 180:
-            return False
-
-        return True
+        return not (lon < -180 or lon > 180)
 
     except (TypeError, ValueError):
         return False
 
 
 def breed_matches_rescue_type(
-    breed: Optional[str],
+    breed: str | None,
     rescue_type: str
 ) -> bool:
     """Check if breed matches rescue type requirements.
@@ -189,7 +185,7 @@ def breed_matches_rescue_type(
 
     Args:
         breed: Animal breed string (may include multiple breeds)
-        rescue_type: Type of rescue ("water", "mountain", "disaster", "tracking")
+        rescue_type: Type of rescue (water/mountain/disaster/tracking)
 
     Returns:
         True if breed matches rescue type requirements, False otherwise
@@ -257,11 +253,7 @@ def breed_matches_rescue_type(
             return False
 
     # Check if any target breed is in the animal's breed string
-    for target_breed in target_breeds:
-        if target_breed in breed:
-            return True
-
-    return False
+    return any(target_breed in breed for target_breed in target_breeds)
 
 
 def bucket_categories(
