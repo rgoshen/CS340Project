@@ -376,6 +376,39 @@ ruff check .
 python -m unittest discover -s tests -p "test_*.py"
 ```
 
+### Continuous Integration (CI/CD)
+
+This project uses GitHub Actions for automated testing and code quality checks.
+
+**CI Workflows:**
+
+1. **On Push** (`.github/workflows/on-push.yml`)
+   - Runs on every push to any branch
+   - Fast feedback loop for development
+   - Steps:
+     - Lint code with ruff
+     - Run all unit tests
+
+2. **On Pull Request** (`.github/workflows/on-pr.yml`)
+   - Runs on PR to main branch
+   - Comprehensive validation before merge
+   - Steps:
+     - Lint code with ruff
+     - Run all unit tests
+     - Generate coverage report
+     - Upload coverage to Codecov
+
+**CI Environment:**
+- Python 3.13
+- Ubuntu latest
+- Pip caching enabled for faster builds
+- All tests run with live MongoDB connection
+
+**Viewing CI Results:**
+- Check the "Actions" tab in GitHub repository
+- PR checks must pass before merging to main
+- Coverage reports available in PR comments
+
 #### Interactive Test Script Example
 
 ```python
