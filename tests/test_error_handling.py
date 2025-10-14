@@ -5,10 +5,10 @@ Tests invalid data types, malformed documents, and error scenarios.
 """
 
 import unittest
+
 from tests.fixtures.test_data import (
+    MALFORMED_DOCUMENTS,
     BaseTestCase,
-    INVALID_DATA_SAMPLES,
-    MALFORMED_DOCUMENTS
 )
 
 

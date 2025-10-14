@@ -7,9 +7,8 @@ used across the test suite.
 
 import os
 import unittest
+from typing import Any
 from unittest.mock import MagicMock, patch
-from typing import Dict, Any
-
 
 # Sample valid animal data following AAC schema
 SAMPLE_ANIMAL_DATA = {
@@ -174,16 +173,19 @@ class BaseTestCase(unittest.TestCase):
 
         # Also cleanup by outcome_type for multi-delete tests
         try:
-            self.shelter.collection.delete_many({"outcome_type": "Test_Delete"})
+            self.shelter.collection.delete_many(
+                {"outcome_type": "Test_Delete"}
+            )
         except Exception:
             pass
 
-    def create_test_animal(self, animal_data: Dict[str, Any] = None) -> bool:
+    def create_test_animal(self, animal_data: dict[str, Any] = None) -> bool:
         """
         Helper method to create a test animal.
 
         Args:
-            animal_data: Animal data dictionary (uses SAMPLE_ANIMAL_DATA if None)
+            animal_data: Animal data dictionary
+                (uses SAMPLE_ANIMAL_DATA if None)
 
         Returns:
             bool: True if creation successful, False otherwise
