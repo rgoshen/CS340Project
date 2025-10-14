@@ -26,7 +26,7 @@ ignore = [
     "SIM105",  # Allow try/except/pass for cleanup code clarity
 ]
 
-# Exclude common directories
+# Exclude common directories and files
 exclude = [
     ".git",
     ".venv",
@@ -38,6 +38,7 @@ exclude = [
     "htmlcov",
     "dist",
     "build",
+    "*.ipynb",  # Exclude Jupyter notebooks
 ]
 
 [format]
