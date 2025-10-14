@@ -280,9 +280,69 @@ print(f"Deleted {delete_count} transfer record(s)")
 
 ### Tests
 
-Testing for this CRUD module is performed using the provided ProjectOneTestScript.ipynb Jupyter Notebook. The test suite includes comprehensive coverage of all CRUD operations:
+Testing for this CRUD module is performed using both:
+1. **Unit Tests** - Python unittest suite in `tests/` directory (recommended for development)
+2. **Interactive Tests** - ProjectOneTestScript.ipynb Jupyter Notebook (for demonstration)
 
-Test Script Example:
+#### Running Unit Tests
+
+The project includes a comprehensive unittest suite with 29 tests covering all CRUD operations:
+
+**With Live MongoDB Database (default):**
+```bash
+# Requires MongoDB running on localhost:27017 with aacuser credentials
+
+# Run all tests
+python -m unittest discover -s tests -p "test_*.py"
+
+# Run with verbose output
+python -m unittest discover -s tests -p "test_*.py" -v
+
+# Run specific test file
+python -m unittest tests.test_crud
+
+# Run specific test class
+python -m unittest tests.test_crud.TestCreate
+
+# Run specific test method
+python -m unittest tests.test_crud.TestCreate.test_create_with_valid_data
+```
+
+**With Mock Database (for CI/offline testing):**
+```bash
+# No MongoDB connection required - uses mocked database
+
+# Run all tests with mock
+USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py"
+
+# Run with verbose output
+USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py" -v
+```
+*Note: Mock database testing is currently in development. All 29 tests pass with live MongoDB.*
+
+**Test Structure:**
+- `tests/test_crud.py` - All CRUD operation tests (17 tests: Create, Read, Update, Delete)
+- `tests/test_authentication.py` - Authentication and connection tests (4 tests)
+- `tests/test_error_handling.py` - Error handling and edge case tests (8 tests)
+- `tests/fixtures/test_data.py` - Shared test data and base test classes
+
+**Total: 29 tests, all passing**
+
+**Test Coverage:**
+```bash
+# Run tests with coverage analysis
+pip install coverage
+coverage run -m unittest discover -s tests -p "test_*.py"
+coverage report -m CRUD_Python_Module.py
+
+# Generate HTML coverage report
+coverage html
+# Open htmlcov/index.html in browser
+```
+
+**Current Coverage: 77%** of CRUD_Python_Module.py
+
+#### Interactive Test Script Example
 
 ```python
 # Import the CRUD module
