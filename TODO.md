@@ -75,12 +75,12 @@ All CRUD operations implemented, tested, and documented according to requirement
     - [x] Test delete with None query
     - [x] Test delete with non-matching query
     - [x] Test delete multiple documents
-- [ ] Create test_authentication.py
-  - [ ] Create TestAuthentication class
-  - [ ] Test valid authentication with correct credentials
-  - [ ] Test invalid authentication with wrong credentials
-  - [ ] Test connection without authentication
-  - [ ] Test MongoDB connection timeout handling
+- [x] Create test_authentication.py
+  - [x] Create TestAuthentication class
+  - [x] Test valid authentication with correct credentials
+  - [x] Test invalid authentication with wrong credentials
+  - [x] Test database and collection access
+  - [x] Test MongoDB connection timeout handling
 - [ ] Create test_error_handling.py
   - [ ] Create TestErrorHandling class
   - [ ] Test create with invalid data types (string, int, list, bool)
