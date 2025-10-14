@@ -174,12 +174,13 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Add comprehensive docstring with examples
   - [x] Write 14 comprehensive unit tests (all passing)
   - [x] Refactor to use match/case instead of if/elif
-- [ ] Implement normalize_sex_intact() function
-  - [ ] Parse sex_upon_outcome into separate sex and intact_status fields
-  - [ ] Handle case-insensitive variations
-  - [ ] Handle whitespace variations
-  - [ ] Handle null/empty values
-  - [ ] Return standardized values (Neutered/Spayed/Intact/Unknown)
+- [x] Implement normalize_sex_intact() function
+  - [x] Parse sex_upon_outcome into separate sex and intact_status fields
+  - [x] Handle case-insensitive variations
+  - [x] Handle whitespace variations
+  - [x] Handle null/empty values
+  - [x] Return standardized values (Neutered/Spayed/Intact/Unknown)
+  - [x] Write 11 comprehensive unit tests (all passing)
 - [ ] Implement breed_matches_rescue_type() function
   - [ ] Implement case-insensitive matching
   - [ ] Handle multi-breed strings with "Mix"

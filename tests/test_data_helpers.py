@@ -2,7 +2,7 @@
 
 import unittest
 
-from data_helpers import parse_age_to_weeks
+from data_helpers import normalize_sex_intact, parse_age_to_weeks
 
 
 class TestParseAgeToWeeks(unittest.TestCase):
@@ -121,6 +121,95 @@ class TestParseAgeToWeeks(unittest.TestCase):
 
         result = parse_age_to_weeks([])
         self.assertIsNone(result)
+
+
+class TestNormalizeSexIntact(unittest.TestCase):
+    """Test cases for normalize_sex_intact function."""
+
+    def test_neutered_male(self):
+        """Test parsing 'Neutered Male'."""
+        sex, intact = normalize_sex_intact("Neutered Male")
+        self.assertEqual(sex, 'Male')
+        self.assertEqual(intact, 'Neutered')
+
+    def test_intact_female(self):
+        """Test parsing 'Intact Female'."""
+        sex, intact = normalize_sex_intact("Intact Female")
+        self.assertEqual(sex, 'Female')
+        self.assertEqual(intact, 'Intact')
+
+    def test_spayed_female(self):
+        """Test parsing 'Spayed Female'."""
+        sex, intact = normalize_sex_intact("Spayed Female")
+        self.assertEqual(sex, 'Female')
+        self.assertEqual(intact, 'Spayed')
+
+    def test_intact_male(self):
+        """Test parsing 'Intact Male'."""
+        sex, intact = normalize_sex_intact("Intact Male")
+        self.assertEqual(sex, 'Male')
+        self.assertEqual(intact, 'Intact')
+
+    def test_case_insensitive(self):
+        """Test case-insensitive parsing."""
+        sex1, intact1 = normalize_sex_intact("NEUTERED MALE")
+        sex2, intact2 = normalize_sex_intact("neutered male")
+        sex3, intact3 = normalize_sex_intact("Neutered Male")
+
+        self.assertEqual(sex1, sex2)
+        self.assertEqual(sex2, sex3)
+        self.assertEqual(intact1, intact2)
+        self.assertEqual(intact2, intact3)
+
+    def test_whitespace_handling(self):
+        """Test handling of whitespace."""
+        sex1, intact1 = normalize_sex_intact("  Neutered Male  ")
+        sex2, intact2 = normalize_sex_intact("Neutered Male")
+
+        self.assertEqual(sex1, sex2)
+        self.assertEqual(intact1, intact2)
+
+    def test_none_input(self):
+        """Test None input returns Unknown."""
+        sex, intact = normalize_sex_intact(None)
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
+
+    def test_empty_string(self):
+        """Test empty string returns Unknown."""
+        sex, intact = normalize_sex_intact("")
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
+
+        sex, intact = normalize_sex_intact("   ")
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
+
+    def test_unknown_value(self):
+        """Test 'Unknown' input returns Unknown."""
+        sex, intact = normalize_sex_intact("Unknown")
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
+
+    def test_invalid_format(self):
+        """Test invalid format returns Unknown for missing parts."""
+        sex, intact = normalize_sex_intact("Male")
+        self.assertEqual(sex, 'Male')
+        self.assertEqual(intact, 'Unknown')
+
+        sex, intact = normalize_sex_intact("Neutered")
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Neutered')
+
+    def test_non_string_input(self):
+        """Test non-string input returns Unknown."""
+        sex, intact = normalize_sex_intact(123)
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
+
+        sex, intact = normalize_sex_intact([])
+        self.assertEqual(sex, 'Unknown')
+        self.assertEqual(intact, 'Unknown')
 
 
 if __name__ == '__main__':
