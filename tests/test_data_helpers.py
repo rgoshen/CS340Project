@@ -2,7 +2,11 @@
 
 import unittest
 
-from data_helpers import normalize_sex_intact, parse_age_to_weeks
+from data_helpers import (
+    normalize_sex_intact,
+    parse_age_to_weeks,
+    validate_coordinates,
+)
 
 
 class TestParseAgeToWeeks(unittest.TestCase):
@@ -210,6 +214,64 @@ class TestNormalizeSexIntact(unittest.TestCase):
         sex, intact = normalize_sex_intact([])
         self.assertEqual(sex, 'Unknown')
         self.assertEqual(intact, 'Unknown')
+
+
+class TestValidateCoordinates(unittest.TestCase):
+    """Test cases for validate_coordinates function."""
+
+    def test_valid_coordinates_float(self):
+        """Test valid coordinates as floats."""
+        self.assertTrue(validate_coordinates(30.2672, -97.7431))
+        self.assertTrue(validate_coordinates(0.0, 0.0))
+        self.assertTrue(validate_coordinates(-90, -180))
+        self.assertTrue(validate_coordinates(90, 180))
+
+    def test_valid_coordinates_string(self):
+        """Test valid coordinates as strings."""
+        self.assertTrue(validate_coordinates("30.2672", "-97.7431"))
+        self.assertTrue(validate_coordinates("0", "0"))
+
+    def test_latitude_out_of_range(self):
+        """Test latitude out of valid range."""
+        self.assertFalse(validate_coordinates(91, -97.7431))
+        self.assertFalse(validate_coordinates(-91, -97.7431))
+        self.assertFalse(validate_coordinates(100, 0))
+
+    def test_longitude_out_of_range(self):
+        """Test longitude out of valid range."""
+        self.assertFalse(validate_coordinates(30.2672, 181))
+        self.assertFalse(validate_coordinates(30.2672, -181))
+        self.assertFalse(validate_coordinates(0, 200))
+
+    def test_none_values(self):
+        """Test None values return False."""
+        self.assertFalse(validate_coordinates(None, -97.7431))
+        self.assertFalse(validate_coordinates(30.2672, None))
+        self.assertFalse(validate_coordinates(None, None))
+
+    def test_invalid_string_values(self):
+        """Test invalid string values return False."""
+        self.assertFalse(validate_coordinates("invalid", -97.7431))
+        self.assertFalse(validate_coordinates(30.2672, "invalid"))
+        self.assertFalse(validate_coordinates("abc", "xyz"))
+
+    def test_non_numeric_types(self):
+        """Test non-numeric types return False."""
+        self.assertFalse(validate_coordinates([], -97.7431))
+        self.assertFalse(validate_coordinates(30.2672, {}))
+        self.assertFalse(validate_coordinates({}, []))
+
+    def test_nan_values(self):
+        """Test NaN values return False."""
+        self.assertFalse(validate_coordinates(float('nan'), -97.7431))
+        self.assertFalse(validate_coordinates(30.2672, float('nan')))
+
+    def test_boundary_values(self):
+        """Test boundary values are valid."""
+        self.assertTrue(validate_coordinates(90, 180))
+        self.assertTrue(validate_coordinates(-90, -180))
+        self.assertTrue(validate_coordinates(90, -180))
+        self.assertTrue(validate_coordinates(-90, 180))
 
 
 if __name__ == '__main__':
