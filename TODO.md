@@ -159,9 +159,10 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Add MONGODB_USER secret (e.g., aacuser)
   - [x] Add MONGODB_PASSWORD secret (e.g., SNHU1234)
 - [x] Install mongosh in CI workflows
-- [ ] Verify CI passes after mongosh installation
-- [ ] Merge CI/CD setup to main (PR #13)
-- [ ] Ensure CI is green before proceeding to dashboard work
+- [x] Verify CI passes after mongosh installation
+- [x] Merge CI/CD setup to main (PR #13)
+- [x] Ensure CI is green before proceeding to dashboard work
+- [ ] Add CI badge to README (deferred to Phase 1)
 
 ## Phase 1: Data Normalization & Helper Functions
 - [ ] Implement parse_age_to_weeks() function
