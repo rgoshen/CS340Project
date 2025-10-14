@@ -304,10 +304,25 @@ Provides at-a-glance project status and technology stack information.
    - 12 comprehensive unit tests (all passing)
    - Enables breed-based filtering for rescue type requirements
 
-**Test Coverage:** 46 tests passing for data_helpers module (14 + 11 + 9 + 12)
+5. **bucket_categories()** - Category Grouping for Dashboard
+   - Groups low-frequency categories into "Other" bucket
+   - Keeps top N categories (default: 10)
+   - Deterministic alphabetical tie-breaking for equal counts
+   - Configurable top_n parameter
+   - Returns mapping dict: original → bucketed value
+   - 9 comprehensive unit tests (all passing)
+   - Enables cleaner dashboard visualizations with reduced clutter
 
-**Remaining Functions:**
-- bucket_categories() - Category grouping for dashboard (optional/deferred)
+**Test Coverage:** 55 tests passing for data_helpers module (14 + 11 + 9 + 12 + 9)
+
+**Phase 1 Status:** ✅ COMPLETE
+
+All helper functions implemented:
+- ✅ parse_age_to_weeks() - Age normalization
+- ✅ normalize_sex_intact() - Sex/status parsing
+- ✅ validate_coordinates() - Geolocation validation
+- ✅ breed_matches_rescue_type() - Breed matching
+- ✅ bucket_categories() - Category grouping
 
 ### Future Phases (Planned)
 - Phase 2: Rescue type filter logic

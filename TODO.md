@@ -196,12 +196,13 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Add docstring with rescue type breed lists
   - [x] Use match/case for rescue type selection
   - [x] Write 12 comprehensive unit tests (all passing)
-- [ ] Implement bucket_categories() function
-  - [ ] Create Top N categories (default N=10)
-  - [ ] Group remaining as "Other"
-  - [ ] Implement deterministic tie-breaking (alphabetical)
-  - [ ] Make N configurable parameter
-- [ ] Create normalize_dataframe() function to apply all normalizations
+- [x] Implement bucket_categories() function
+  - [x] Create Top N categories (default N=10)
+  - [x] Group remaining as "Other"
+  - [x] Implement deterministic tie-breaking (alphabetical)
+  - [x] Make N configurable parameter
+  - [x] Write 9 comprehensive unit tests (all passing)
+- [ ] Create normalize_dataframe() function (deferred to Phase 2)
   - [ ] Apply age parsing to create age_weeks column
   - [ ] Apply sex/intact normalization
   - [ ] Apply coordinate validation to create valid_coords flag

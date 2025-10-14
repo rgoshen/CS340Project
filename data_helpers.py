@@ -5,6 +5,7 @@ animal shelter data for use in the dashboard and rescue type filtering.
 """
 
 import re
+from collections import Counter
 from typing import Optional
 
 
@@ -261,3 +262,53 @@ def breed_matches_rescue_type(
             return True
 
     return False
+
+
+def bucket_categories(
+    values: list[str],
+    top_n: int = 10
+) -> dict[str, str]:
+    """Group low-frequency categories into 'Other' bucket.
+
+    Creates top N categories and groups remaining values as "Other"
+    for cleaner dashboard visualizations. Uses deterministic alphabetical
+    tie-breaking when categories have equal counts.
+
+    Args:
+        values: List of category values (e.g., breeds, colors)
+        top_n: Number of top categories to keep (default: 10)
+
+    Returns:
+        Dictionary mapping original values to bucketed values
+        (either original value or "Other")
+
+    Examples:
+        >>> values = ["Dog", "Dog", "Cat", "Cat", "Bird", "Fish"]
+        >>> bucket_categories(values, top_n=2)
+        {'Dog': 'Dog', 'Cat': 'Cat', 'Bird': 'Other', 'Fish': 'Other'}
+    """
+    if not values or top_n <= 0:
+        return {}
+
+    # Count occurrences
+    counts = Counter(values)
+
+    # Get top N categories with deterministic tie-breaking
+    # Sort by count (descending), then alphabetically for ties
+    top_categories = sorted(
+        counts.items(),
+        key=lambda x: (-x[1], x[0])
+    )[:top_n]
+
+    # Create set of top category names
+    top_names = {cat[0] for cat in top_categories}
+
+    # Create mapping: top categories map to themselves, others to "Other"
+    mapping = {}
+    for value in values:
+        if value in top_names:
+            mapping[value] = value
+        else:
+            mapping[value] = 'Other'
+
+    return mapping
