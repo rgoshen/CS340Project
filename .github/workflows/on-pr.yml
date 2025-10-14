@@ -35,6 +35,26 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Wait for MongoDB and create test user
+      env:
+        MONGODB_USER: ${{ secrets.MONGODB_USER }}
+        MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      run: |
+        # Wait for MongoDB to be ready
+        timeout 60 bash -c 'until mongosh --eval "db.adminCommand({ping: 1})" --quiet; do sleep 2; done'
+
+        # Create database and user for tests
+        mongosh admin --eval "
+          db.createUser({
+            user: '$MONGODB_USER',
+            pwd: '$MONGODB_PASSWORD',
+            roles: [{role: 'readWrite', db: 'aac'}]
+          })
+        "
+
+        # Verify connection
+        mongosh -u "$MONGODB_USER" -p "$MONGODB_PASSWORD" --authenticationDatabase admin aac --eval "db.createCollection('animals')"
+
     - name: Run ruff linter
       run: |
         ruff check .
