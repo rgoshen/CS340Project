@@ -282,12 +282,32 @@ Provides at-a-glance project status and technology stack information.
    - 11 comprehensive unit tests (all passing)
    - Enables sex and intact status filtering for rescue requirements
 
-**Test Coverage:** 25 tests passing for data_helpers module
+3. **validate_coordinates()** - Geolocation Validation
+   - Validates geographic coordinates for mapping
+   - Coerces strings to floats
+   - Validates latitude range [-90, 90]
+   - Validates longitude range [-180, 180]
+   - Handles None, NaN, and non-numeric values
+   - Returns boolean: True if valid, False otherwise
+   - 9 comprehensive unit tests (all passing)
+   - Enables geolocation filtering and map display
+
+4. **breed_matches_rescue_type()** - Breed Matching for Rescue Types
+   - Determines if breed is suitable for rescue type (water, mountain, disaster, tracking)
+   - Predefined breed lists per rescue type
+   - Case-insensitive substring matching
+   - Handles multi-breed strings ("Mix", "/", etc.)
+   - Uses match/case for rescue type selection
+   - Water: Labrador Retriever, Chesapeake Bay Retriever, Newfoundland
+   - Mountain: German Shepherd, Alaskan Malamute, Old English Sheepdog, Siberian Husky, Rottweiler
+   - Disaster/Tracking: Doberman Pinscher, German Shepherd, Golden Retriever, Bloodhound, Rottweiler
+   - 12 comprehensive unit tests (all passing)
+   - Enables breed-based filtering for rescue type requirements
+
+**Test Coverage:** 46 tests passing for data_helpers module (14 + 11 + 9 + 12)
 
 **Remaining Functions:**
-- breed_matches_rescue_type() - Breed matching with multi-breed support
-- validate_coordinates() - Geolocation validation
-- bucket_categories() - Category grouping for dashboard
+- bucket_categories() - Category grouping for dashboard (optional/deferred)
 
 ### Future Phases (Planned)
 - Phase 2: Rescue type filter logic

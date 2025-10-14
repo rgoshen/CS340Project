@@ -188,15 +188,14 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Return valid_coords boolean flag
   - [x] Handle NaN and non-numeric values
   - [x] Write 9 comprehensive unit tests (all passing)
-- [ ] Implement breed_matches_rescue_type() function
-  - [ ] Implement case-insensitive matching
-  - [ ] Handle multi-breed strings with "Mix"
-  - [ ] Handle multi-breed strings with "/" separator
-  - [ ] Handle multi-breed strings with "," separator
-  - [ ] Make non-ASCII safe
-  - [ ] Add docstring with rescue type breed lists
-  - [ ] Return valid_coords boolean flag
-  - [ ] Handle NaN and non-numeric values
+- [x] Implement breed_matches_rescue_type() function
+  - [x] Implement case-insensitive matching
+  - [x] Handle multi-breed strings with "Mix"
+  - [x] Handle multi-breed strings with "/" separator
+  - [x] Handle substring matching for all separators
+  - [x] Add docstring with rescue type breed lists
+  - [x] Use match/case for rescue type selection
+  - [x] Write 12 comprehensive unit tests (all passing)
 - [ ] Implement bucket_categories() function
   - [ ] Create Top N categories (default N=10)
   - [ ] Group remaining as "Other"
