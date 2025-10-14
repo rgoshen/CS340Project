@@ -342,6 +342,40 @@ coverage html
 
 **Current Coverage: 77%** of CRUD_Python_Module.py
 
+### Code Quality & Linting
+
+This project uses **ruff** for fast Python linting and code quality checks.
+
+**Running the linter:**
+```bash
+# Check all Python files for issues
+ruff check .
+
+# Check specific files
+ruff check CRUD_Python_Module.py tests/
+
+# Auto-fix issues where possible
+ruff check --fix .
+
+# Show detailed output
+ruff check --output-format=full .
+```
+
+**Linting Configuration:**
+- Configuration file: `ruff.toml`
+- Target: Python 3.13
+- Line length: 79 characters (PEP 8)
+- Enabled rules: pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, flake8-bugbear
+
+**Pre-commit checks:**
+```bash
+# Run linter before committing
+ruff check .
+
+# Run tests before committing
+python -m unittest discover -s tests -p "test_*.py"
+```
+
 #### Interactive Test Script Example
 
 ```python

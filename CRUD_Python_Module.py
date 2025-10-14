@@ -5,20 +5,21 @@ This module provides MongoDB CRUD operations for animal shelter data
 following PEP 8 and industry best practices.
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any
+
 from pymongo import MongoClient
 from pymongo.errors import (
-    ConnectionFailure,
-    ServerSelectionTimeoutError,
     ConfigurationError,
-    PyMongoError,
+    ConnectionFailure,
     DuplicateKeyError,
+    OperationFailure,
+    PyMongoError,
+    ServerSelectionTimeoutError,
     WriteError,
-    OperationFailure
 )
 
 
-class AnimalShelter(object):
+class AnimalShelter:
     """
     CRUD operations for Animal collection in MongoDB.
 
@@ -110,9 +111,7 @@ class AnimalShelter(object):
         Returns:
             bool: True if valid, False otherwise
         """
-        if data is None:
-            return False
-        return True
+        return data is not None
 
     def _handle_database_error(
         self, operation: str, error: PyMongoError
@@ -126,7 +125,7 @@ class AnimalShelter(object):
         """
         print(f"{operation} operation failed: {error}")
 
-    def create(self, data: Optional[Dict[str, Any]]) -> bool:
+    def create(self, data: dict[str, Any] | None) -> bool:
         """
         Insert a document into the animals collection.
 
@@ -197,7 +196,7 @@ class AnimalShelter(object):
             print(f"Unexpected error during insert: {error}")
             return False
 
-    def read(self, query: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def read(self, query: dict[str, Any] | None) -> list[dict[str, Any]]:
         """
         Query documents from the animals collection.
 
@@ -252,8 +251,8 @@ class AnimalShelter(object):
 
     def update(
         self,
-        query: Optional[Dict[str, Any]],
-        update_data: Optional[Dict[str, Any]]
+        query: dict[str, Any] | None,
+        update_data: dict[str, Any] | None
     ) -> int:
         """
         Update documents in the animals collection.
@@ -303,7 +302,7 @@ class AnimalShelter(object):
             # Check if update_data contains MongoDB update operators
             # Operators start with $ (e.g., $set, $inc, $push, $pull)
             has_operator = any(
-                key.startswith('$') for key in update_data.keys()
+                key.startswith('$') for key in update_data
             )
 
             # If no operator provided, wrap in $set for safety
@@ -333,7 +332,7 @@ class AnimalShelter(object):
             print(f"Unexpected error during update: {error}")
             return 0
 
-    def delete(self, query: Optional[Dict[str, Any]]) -> int:
+    def delete(self, query: dict[str, Any] | None) -> int:
         """
         Delete documents from the animals collection.
 

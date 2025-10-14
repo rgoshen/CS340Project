@@ -5,11 +5,12 @@ Tests MongoDB authentication, connection timeouts, and security scenarios.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from pymongo.errors import (
     ConnectionFailure,
+    OperationFailure,
     ServerSelectionTimeoutError,
-    OperationFailure
 )
 
 
@@ -61,7 +62,7 @@ class TestAuthentication(unittest.TestCase):
             mock_client.side_effect = ServerSelectionTimeoutError("Timeout")
 
             with self.assertRaises(ServerSelectionTimeoutError):
-                shelter_timeout = AnimalShelter()
+                AnimalShelter()
 
     def test_database_and_collection_access(self):
         """Test that database and collection are properly accessible."""
