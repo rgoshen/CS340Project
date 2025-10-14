@@ -280,9 +280,44 @@ print(f"Deleted {delete_count} transfer record(s)")
 
 ### Tests
 
-Testing for this CRUD module is performed using the provided ProjectOneTestScript.ipynb Jupyter Notebook. The test suite includes comprehensive coverage of all CRUD operations:
+Testing for this CRUD module is performed using both:
+1. **Unit Tests** - Python unittest suite in `tests/` directory (recommended for development)
+2. **Interactive Tests** - ProjectOneTestScript.ipynb Jupyter Notebook (for demonstration)
 
-Test Script Example:
+#### Running Unit Tests
+
+The project includes a comprehensive unittest suite with 17 tests covering all CRUD operations:
+
+```bash
+# Run all tests
+python -m unittest discover -s tests -p "test_*.py"
+
+# Run with verbose output
+python -m unittest discover -s tests -p "test_*.py" -v
+
+# Run specific test file
+python -m unittest tests.test_crud
+
+# Run specific test class
+python -m unittest tests.test_crud.TestCreate
+
+# Run specific test method
+python -m unittest tests.test_crud.TestCreate.test_create_with_valid_data
+```
+
+**Test Structure:**
+- `tests/test_crud.py` - All CRUD operation tests (Create, Read, Update, Delete)
+- `tests/test_authentication.py` - Authentication and connection tests (coming soon)
+- `tests/test_error_handling.py` - Error handling and edge case tests (coming soon)
+- `tests/fixtures/test_data.py` - Shared test data and base test classes
+
+**Using Mock Database (for CI/offline testing):**
+```bash
+# Run tests without live MongoDB connection
+USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py"
+```
+
+#### Interactive Test Script Example
 
 ```python
 # Import the CRUD module
