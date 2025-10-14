@@ -162,41 +162,47 @@ All CRUD operations implemented, tested, and documented according to requirement
 - [x] Verify CI passes after mongosh installation
 - [x] Merge CI/CD setup to main (PR #13)
 - [x] Ensure CI is green before proceeding to dashboard work
-- [ ] Add CI badge to README (deferred to Phase 1)
 
 ## Phase 1: Data Normalization & Helper Functions
-- [ ] Implement parse_age_to_weeks() function
-  - [ ] Handle "X weeks" format
-  - [ ] Handle "X months" format (multiply by 4.345)
-  - [ ] Handle "X years" format (multiply by 52.143)
-  - [ ] Handle "X days" format (divide by 7)
-  - [ ] Handle edge cases: malformed strings, nulls, negative values, zero
-  - [ ] Add comprehensive docstring with examples
-- [ ] Implement normalize_sex_intact() function
-  - [ ] Parse sex_upon_outcome into separate sex and intact_status fields
-  - [ ] Handle case-insensitive variations
-  - [ ] Handle whitespace variations
-  - [ ] Handle null/empty values
-  - [ ] Return standardized values (Neutered/Spayed/Intact/Unknown)
-- [ ] Implement breed_matches_rescue_type() function
-  - [ ] Implement case-insensitive matching
-  - [ ] Handle multi-breed strings with "Mix"
-  - [ ] Handle multi-breed strings with "/" separator
-  - [ ] Handle multi-breed strings with "," separator
-  - [ ] Make non-ASCII safe
-  - [ ] Add docstring with rescue type breed lists
-- [ ] Implement validate_coordinates() function
-  - [ ] Coerce location_lat and location_long to floats
-  - [ ] Validate latitude range [-90, 90]
-  - [ ] Validate longitude range [-180, 180]
-  - [ ] Return valid_coords boolean flag
-  - [ ] Handle NaN and non-numeric values
-- [ ] Implement bucket_categories() function
-  - [ ] Create Top N categories (default N=10)
-  - [ ] Group remaining as "Other"
-  - [ ] Implement deterministic tie-breaking (alphabetical)
-  - [ ] Make N configurable parameter
-- [ ] Create normalize_dataframe() function to apply all normalizations
+- [x] Add CI and project badges to README
+- [x] Implement parse_age_to_weeks() function
+  - [x] Handle "X weeks" format
+  - [x] Handle "X months" format (multiply by 4.345)
+  - [x] Handle "X years" format (multiply by 52.143)
+  - [x] Handle "X days" format (divide by 7)
+  - [x] Handle edge cases: malformed strings, nulls, negative values, zero
+  - [x] Add comprehensive docstring with examples
+  - [x] Write 14 comprehensive unit tests (all passing)
+  - [x] Refactor to use match/case instead of if/elif
+- [x] Implement normalize_sex_intact() function
+  - [x] Parse sex_upon_outcome into separate sex and intact_status fields
+  - [x] Handle case-insensitive variations
+  - [x] Handle whitespace variations
+  - [x] Handle null/empty values
+  - [x] Return standardized values (Neutered/Spayed/Intact/Unknown)
+  - [x] Write 11 comprehensive unit tests (all passing)
+- [x] Implement validate_coordinates() function
+  - [x] Coerce location_lat and location_long to floats
+  - [x] Validate latitude range [-90, 90]
+  - [x] Validate longitude range [-180, 180]
+  - [x] Return valid_coords boolean flag
+  - [x] Handle NaN and non-numeric values
+  - [x] Write 9 comprehensive unit tests (all passing)
+- [x] Implement breed_matches_rescue_type() function
+  - [x] Implement case-insensitive matching
+  - [x] Handle multi-breed strings with "Mix"
+  - [x] Handle multi-breed strings with "/" separator
+  - [x] Handle substring matching for all separators
+  - [x] Add docstring with rescue type breed lists
+  - [x] Use match/case for rescue type selection
+  - [x] Write 12 comprehensive unit tests (all passing)
+- [x] Implement bucket_categories() function
+  - [x] Create Top N categories (default N=10)
+  - [x] Group remaining as "Other"
+  - [x] Implement deterministic tie-breaking (alphabetical)
+  - [x] Make N configurable parameter
+  - [x] Write 9 comprehensive unit tests (all passing)
+- [ ] Create normalize_dataframe() function (deferred to Phase 2)
   - [ ] Apply age parsing to create age_weeks column
   - [ ] Apply sex/intact normalization
   - [ ] Apply coordinate validation to create valid_coords flag

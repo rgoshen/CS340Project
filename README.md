@@ -1,5 +1,12 @@
 # Grazioso Rescue Finder
 
+![CI Status](https://github.com/rgoshen/CS340Project/actions/workflows/on-push.yml/badge.svg)
+![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)
+![MongoDB Version](https://img.shields.io/badge/mongodb-8.0-green.svg)
+![PyMongo Version](https://img.shields.io/badge/pymongo-4.10.1-blue.svg)
+![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 - [Grazioso Rescue Finder](#grazioso-rescue-finder)
   - [About the Project](#about-the-project)
   - [Motivation](#motivation)
