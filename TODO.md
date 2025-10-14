@@ -111,23 +111,22 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Document test execution in README
 
 ### CI/CD Setup (GitHub Actions)
-- [ ] Create .github/workflows/ directory
-- [ ] Implement push workflow (linting + unit tests only)
-  - [ ] Create .github/workflows/on-push.yml
-  - [ ] Configure Python 3.13 environment
-  - [ ] Add pip cache configuration
-  - [ ] Add ruff linter step (fail on errors)
-  - [ ] Add unit test execution step
-  - [ ] Ensure no network/DB calls in unit tests
-  - [ ] Configure to run on push to any branch
-- [ ] Implement pull_request workflow (linting + unit + integration)
-  - [ ] Create .github/workflows/on-pr.yml
-  - [ ] Configure Python 3.13 environment
-  - [ ] Add pip cache configuration
-  - [ ] Add ruff linter step (fail on errors)
-  - [ ] Add unit test execution step
-  - [ ] Add integration test execution step (mocked DB)
-  - [ ] Configure to run on PR to main branch
+- [x] Create .github/workflows/ directory
+- [x] Implement push workflow (linting + unit tests only)
+  - [x] Create .github/workflows/on-push.yml
+  - [x] Configure Python 3.13 environment
+  - [x] Add pip cache configuration
+  - [x] Add ruff linter step (fail on errors)
+  - [x] Add unit test execution step
+  - [x] Configure to run on push to any branch
+- [x] Implement pull_request workflow (linting + unit + coverage)
+  - [x] Create .github/workflows/on-pr.yml
+  - [x] Configure Python 3.13 environment
+  - [x] Add pip cache configuration
+  - [x] Add ruff linter step (fail on errors)
+  - [x] Add unit test execution step
+  - [x] Add coverage reporting step
+  - [x] Configure to run on PR to main branch
 - [x] Add ruff configuration
   - [x] Create ruff.toml
   - [x] Configure line length (79 for PEP 8)
@@ -138,10 +137,11 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Run ruff check on CRUD_Python_Module.py and tests
   - [x] Verify unit tests pass in isolation (29/29 passing)
   - [x] Fix all linting issues
-- [ ] Document CI/CD in README
-  - [ ] Add CI badge to README
-  - [ ] Document how to run tests locally
-  - [ ] Explain CI workflow differences (push vs PR)
+- [x] Document CI/CD in README
+  - [x] Document CI workflows (push vs PR)
+  - [x] Explain CI environment and configuration
+  - [x] Document how to view CI results
+  - [ ] Add CI badge to README (after first successful run)
 
 ### Phase 0 Branch Strategy
 - [x] Create feature/phase0-testing-infrastructure branch
