@@ -141,15 +141,25 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Document CI workflows (push vs PR)
   - [x] Explain CI environment and configuration
   - [x] Document how to view CI results
+  - [x] Document GitHub Secrets requirement for MongoDB credentials
   - [ ] Add CI badge to README (after first successful run)
+- [x] Configure MongoDB service in CI workflows with GitHub Secrets
+  - [x] Add MongoDB 8.0 service container to workflows
+  - [x] Create user creation step using secrets
+  - [x] Update workflows to use MONGODB_USER and MONGODB_PASSWORD secrets
+  - [x] Document security rationale in SUMMARY.md
 
 ### Phase 0 Branch Strategy
 - [x] Create feature/phase0-testing-infrastructure branch
 - [x] Commit test conversion changes incrementally
 - [x] Merge testing infrastructure to main (PR #12)
 - [x] Create feature/phase0-ci-setup branch
-- [ ] Commit CI/CD configuration changes incrementally
-- [ ] Merge CI/CD setup to main
+- [x] Commit CI/CD configuration changes incrementally
+- [ ] Configure GitHub Secrets in repository settings
+  - [ ] Add MONGODB_USER secret (e.g., aacuser)
+  - [ ] Add MONGODB_PASSWORD secret (e.g., SNHU1234)
+- [ ] Verify CI passes after secrets configured
+- [ ] Merge CI/CD setup to main (PR #13)
 - [ ] Ensure CI is green before proceeding to dashboard work
 
 ## Phase 1: Data Normalization & Helper Functions

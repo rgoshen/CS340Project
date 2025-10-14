@@ -401,8 +401,26 @@ This project uses GitHub Actions for automated testing and code quality checks.
 **CI Environment:**
 - Python 3.13
 - Ubuntu latest
+- MongoDB 8.0 service container
 - Pip caching enabled for faster builds
 - All tests run with live MongoDB connection
+
+**Required GitHub Secrets:**
+
+The CI/CD workflows require two secrets to be configured in the repository:
+
+1. Navigate to: **Settings** → **Secrets and variables** → **Actions**
+2. Add the following secrets:
+   - `MONGODB_USER` - MongoDB username for testing (e.g., `aacuser`)
+   - `MONGODB_PASSWORD` - MongoDB password for testing
+
+**Why Secrets?**
+- Passwords never appear in code or workflow files
+- Easy to rotate credentials without code changes
+- Follows security best practices
+- Secrets are encrypted at rest in GitHub
+
+**Note:** Workflows will fail with authentication errors if secrets are not configured.
 
 **Viewing CI Results:**
 - Check the "Actions" tab in GitHub repository
