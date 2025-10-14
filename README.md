@@ -342,6 +342,91 @@ coverage html
 
 **Current Coverage: 77%** of CRUD_Python_Module.py
 
+### Code Quality & Linting
+
+This project uses **ruff** for fast Python linting and code quality checks.
+
+**Running the linter:**
+```bash
+# Check all Python files for issues
+ruff check .
+
+# Check specific files
+ruff check CRUD_Python_Module.py tests/
+
+# Auto-fix issues where possible
+ruff check --fix .
+
+# Show detailed output
+ruff check --output-format=full .
+```
+
+**Linting Configuration:**
+- Configuration file: `ruff.toml`
+- Target: Python 3.13
+- Line length: 79 characters (PEP 8)
+- Enabled rules: pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, flake8-bugbear
+
+**Pre-commit checks:**
+```bash
+# Run linter before committing
+ruff check .
+
+# Run tests before committing
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+### Continuous Integration (CI/CD)
+
+This project uses GitHub Actions for automated testing and code quality checks.
+
+**CI Workflows:**
+
+1. **On Push** (`.github/workflows/on-push.yml`)
+   - Runs on every push to any branch
+   - Fast feedback loop for development
+   - Steps:
+     - Lint code with ruff
+     - Run all unit tests
+
+2. **On Pull Request** (`.github/workflows/on-pr.yml`)
+   - Runs on PR to main branch
+   - Comprehensive validation before merge
+   - Steps:
+     - Lint code with ruff
+     - Run all unit tests
+     - Generate coverage report
+     - Upload coverage to Codecov
+
+**CI Environment:**
+- Python 3.13
+- Ubuntu latest
+- MongoDB 8.0 service container
+- Pip caching enabled for faster builds
+- All tests run with live MongoDB connection
+
+**Required GitHub Secrets:**
+
+The CI/CD workflows require two secrets to be configured in the repository:
+
+1. Navigate to: **Settings** → **Secrets and variables** → **Actions**
+2. Add the following secrets:
+   - `MONGODB_USER` - MongoDB username for testing (e.g., `aacuser`)
+   - `MONGODB_PASSWORD` - MongoDB password for testing
+
+**Why Secrets?**
+- Passwords never appear in code or workflow files
+- Easy to rotate credentials without code changes
+- Follows security best practices
+- Secrets are encrypted at rest in GitHub
+
+**Note:** Workflows will fail with authentication errors if secrets are not configured.
+
+**Viewing CI Results:**
+- Check the "Actions" tab in GitHub repository
+- PR checks must pass before merging to main
+- Coverage reports available in PR comments
+
 #### Interactive Test Script Example
 
 ```python

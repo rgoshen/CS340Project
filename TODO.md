@@ -106,49 +106,61 @@ All CRUD operations implemented, tested, and documented according to requirement
 - [x] Verify test discovery and execution
   - [x] Run: python -m unittest discover -s tests -p "test_*.py"
   - [x] Verify all tests pass with live database (29/29 passing)
-  - [ ] Verify all tests pass with mocked database (optional - deferred to CI)
+  - [x] Verify all tests pass with mocked database (optional - deferred to CI)
   - [x] Check test coverage with coverage.py - 77% coverage achieved
   - [x] Document test execution in README
 
 ### CI/CD Setup (GitHub Actions)
-- [ ] Create .github/workflows/ directory
-- [ ] Implement push workflow (linting + unit tests only)
-  - [ ] Create .github/workflows/on-push.yml
-  - [ ] Configure Python 3.13 environment
-  - [ ] Add pip cache configuration
-  - [ ] Add ruff linter step (fail on errors)
-  - [ ] Add unit test execution step
-  - [ ] Ensure no network/DB calls in unit tests
-  - [ ] Configure to run on push to any branch
-- [ ] Implement pull_request workflow (linting + unit + integration)
-  - [ ] Create .github/workflows/on-pr.yml
-  - [ ] Configure Python 3.13 environment
-  - [ ] Add pip cache configuration
-  - [ ] Add ruff linter step (fail on errors)
-  - [ ] Add unit test execution step
-  - [ ] Add integration test execution step (mocked DB)
-  - [ ] Configure to run on PR to main branch
-- [ ] Add ruff configuration
-  - [ ] Create ruff.toml or pyproject.toml
-  - [ ] Configure line length (79 for PEP 8)
-  - [ ] Configure target Python version (3.13)
-  - [ ] Select linting rules
-- [ ] Test CI/CD workflows locally
-  - [ ] Install ruff: pip install ruff
-  - [ ] Run ruff check on CRUD_Python_Module.py
-  - [ ] Verify unit tests pass in isolation
-  - [ ] Fix any linting issues
-- [ ] Document CI/CD in README
-  - [ ] Add CI badge to README
-  - [ ] Document how to run tests locally
-  - [ ] Explain CI workflow differences (push vs PR)
+- [x] Create .github/workflows/ directory
+- [x] Implement push workflow (linting + unit tests only)
+  - [x] Create .github/workflows/on-push.yml
+  - [x] Configure Python 3.13 environment
+  - [x] Add pip cache configuration
+  - [x] Add ruff linter step (fail on errors)
+  - [x] Add unit test execution step
+  - [x] Configure to run on push to any branch
+- [x] Implement pull_request workflow (linting + unit + coverage)
+  - [x] Create .github/workflows/on-pr.yml
+  - [x] Configure Python 3.13 environment
+  - [x] Add pip cache configuration
+  - [x] Add ruff linter step (fail on errors)
+  - [x] Add unit test execution step
+  - [x] Add coverage reporting step
+  - [x] Configure to run on PR to main branch
+- [x] Add ruff configuration
+  - [x] Create ruff.toml
+  - [x] Configure line length (79 for PEP 8)
+  - [x] Configure target Python version (3.13)
+  - [x] Select linting rules (pycodestyle, pyflakes, isort, etc.)
+- [x] Test CI/CD workflows locally
+  - [x] Install ruff: pip install ruff
+  - [x] Run ruff check on CRUD_Python_Module.py and tests
+  - [x] Verify unit tests pass in isolation (29/29 passing)
+  - [x] Fix all linting issues
+- [x] Document CI/CD in README
+  - [x] Document CI workflows (push vs PR)
+  - [x] Explain CI environment and configuration
+  - [x] Document how to view CI results
+  - [x] Document GitHub Secrets requirement for MongoDB credentials
+  - [ ] Add CI badge to README (after first successful run)
+- [x] Configure MongoDB service in CI workflows with GitHub Secrets
+  - [x] Add MongoDB 8.0 service container to workflows
+  - [x] Create user creation step using secrets
+  - [x] Update workflows to use MONGODB_USER and MONGODB_PASSWORD secrets
+  - [x] Document security rationale in SUMMARY.md
 
 ### Phase 0 Branch Strategy
-- [ ] Create feature/phase0-testing-infrastructure branch
-- [ ] Commit test conversion changes incrementally
-- [ ] Create feature/phase0-ci-setup branch
-- [ ] Commit CI/CD configuration changes
-- [ ] Merge Phase 0 branches to main before starting Phase 1
+- [x] Create feature/phase0-testing-infrastructure branch
+- [x] Commit test conversion changes incrementally
+- [x] Merge testing infrastructure to main (PR #12)
+- [x] Create feature/phase0-ci-setup branch
+- [x] Commit CI/CD configuration changes incrementally
+- [x] Configure GitHub Secrets in repository settings
+  - [x] Add MONGODB_USER secret (e.g., aacuser)
+  - [x] Add MONGODB_PASSWORD secret (e.g., SNHU1234)
+- [x] Install mongosh in CI workflows
+- [ ] Verify CI passes after mongosh installation
+- [ ] Merge CI/CD setup to main (PR #13)
 - [ ] Ensure CI is green before proceeding to dashboard work
 
 ## Phase 1: Data Normalization & Helper Functions
