@@ -162,9 +162,9 @@ All CRUD operations implemented, tested, and documented according to requirement
 - [x] Verify CI passes after mongosh installation
 - [x] Merge CI/CD setup to main (PR #13)
 - [x] Ensure CI is green before proceeding to dashboard work
-- [ ] Add CI badge to README (deferred to Phase 1)
 
 ## Phase 1: Data Normalization & Helper Functions
+- [x] Add CI and project badges to README
 - [ ] Implement parse_age_to_weeks() function
   - [ ] Handle "X weeks" format
   - [ ] Handle "X months" format (multiply by 4.345)
