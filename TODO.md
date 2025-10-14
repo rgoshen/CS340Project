@@ -165,13 +165,15 @@ All CRUD operations implemented, tested, and documented according to requirement
 
 ## Phase 1: Data Normalization & Helper Functions
 - [x] Add CI and project badges to README
-- [ ] Implement parse_age_to_weeks() function
-  - [ ] Handle "X weeks" format
-  - [ ] Handle "X months" format (multiply by 4.345)
-  - [ ] Handle "X years" format (multiply by 52.143)
-  - [ ] Handle "X days" format (divide by 7)
-  - [ ] Handle edge cases: malformed strings, nulls, negative values, zero
-  - [ ] Add comprehensive docstring with examples
+- [x] Implement parse_age_to_weeks() function
+  - [x] Handle "X weeks" format
+  - [x] Handle "X months" format (multiply by 4.345)
+  - [x] Handle "X years" format (multiply by 52.143)
+  - [x] Handle "X days" format (divide by 7)
+  - [x] Handle edge cases: malformed strings, nulls, negative values, zero
+  - [x] Add comprehensive docstring with examples
+  - [x] Write 14 comprehensive unit tests (all passing)
+  - [x] Refactor to use match/case instead of if/elif
 - [ ] Implement normalize_sex_intact() function
   - [ ] Parse sex_upon_outcome into separate sex and intact_status fields
   - [ ] Handle case-insensitive variations
