@@ -124,3 +124,54 @@ def normalize_sex_intact(
         intact_status = 'Intact'
 
     return (sex, intact_status)
+
+
+def validate_coordinates(
+    location_lat: Optional[float | str],
+    location_long: Optional[float | str]
+) -> bool:
+    """Validate geographic coordinates.
+
+    Checks if latitude and longitude values are within valid ranges
+    and can be coerced to floats.
+
+    Args:
+        location_lat: Latitude value (-90 to 90)
+        location_long: Longitude value (-180 to 180)
+
+    Returns:
+        True if both coordinates are valid, False otherwise
+
+    Examples:
+        >>> validate_coordinates(30.2672, -97.7431)
+        True
+        >>> validate_coordinates("30.2672", "-97.7431")
+        True
+        >>> validate_coordinates(91, -97.7431)
+        False
+        >>> validate_coordinates(30.2672, -181)
+        False
+        >>> validate_coordinates(None, -97.7431)
+        False
+        >>> validate_coordinates("invalid", -97.7431)
+        False
+    """
+    try:
+        lat = float(location_lat)
+        lon = float(location_long)
+
+        # Check for NaN
+        if lat != lat or lon != lon:  # NaN check
+            return False
+
+        # Validate ranges
+        if lat < -90 or lat > 90:
+            return False
+
+        if lon < -180 or lon > 180:
+            return False
+
+        return True
+
+    except (TypeError, ValueError):
+        return False

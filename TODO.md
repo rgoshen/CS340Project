@@ -181,6 +181,13 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Handle null/empty values
   - [x] Return standardized values (Neutered/Spayed/Intact/Unknown)
   - [x] Write 11 comprehensive unit tests (all passing)
+- [x] Implement validate_coordinates() function
+  - [x] Coerce location_lat and location_long to floats
+  - [x] Validate latitude range [-90, 90]
+  - [x] Validate longitude range [-180, 180]
+  - [x] Return valid_coords boolean flag
+  - [x] Handle NaN and non-numeric values
+  - [x] Write 9 comprehensive unit tests (all passing)
 - [ ] Implement breed_matches_rescue_type() function
   - [ ] Implement case-insensitive matching
   - [ ] Handle multi-breed strings with "Mix"
@@ -188,10 +195,6 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [ ] Handle multi-breed strings with "," separator
   - [ ] Make non-ASCII safe
   - [ ] Add docstring with rescue type breed lists
-- [ ] Implement validate_coordinates() function
-  - [ ] Coerce location_lat and location_long to floats
-  - [ ] Validate latitude range [-90, 90]
-  - [ ] Validate longitude range [-180, 180]
   - [ ] Return valid_coords boolean flag
   - [ ] Handle NaN and non-numeric values
 - [ ] Implement bucket_categories() function
