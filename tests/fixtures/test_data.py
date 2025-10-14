@@ -98,7 +98,7 @@ QUERY_SAMPLES = {
 # Sample update operations
 UPDATE_SAMPLES = {
     "simple_update": {"outcome_type": "Return to Owner"},
-    "with_set": {"$set": {"outcome_type": "Adoption"}},
+    "with_set": {"$set": {"outcome_type": "Transfer"}},
     "with_inc": {"$inc": {"adoption_count": 1}}
 }
 
@@ -131,6 +131,9 @@ class BaseTestCase(unittest.TestCase):
         """Clean up test data after each test method."""
         if not self.use_mock and hasattr(self, 'shelter'):
             self._cleanup_test_data()
+            # Close MongoDB connection to prevent resource warnings
+            if hasattr(self.shelter, 'client'):
+                self.shelter.client.close()
 
     def _setup_real_db(self):
         """Set up connection to real MongoDB instance."""
@@ -159,7 +162,8 @@ class BaseTestCase(unittest.TestCase):
         """Remove all test data from database."""
         test_ids = [
             "TestID001", "TestID002", "TestID003",
-            "TEST_MALFORMED", "TEST_SPECIAL_CHARS", "TEST_UNICODE"
+            "TEST_MALFORMED", "TEST_SPECIAL_CHARS", "TEST_UNICODE",
+            "TestDelete001", "TestDelete002", "TestDelete003"
         ]
 
         for test_id in test_ids:
@@ -167,6 +171,12 @@ class BaseTestCase(unittest.TestCase):
                 self.shelter.collection.delete_many({"animal_id": test_id})
             except Exception:
                 pass  # Ignore cleanup errors
+
+        # Also cleanup by outcome_type for multi-delete tests
+        try:
+            self.shelter.collection.delete_many({"outcome_type": "Test_Delete"})
+        except Exception:
+            pass
 
     def create_test_animal(self, animal_data: Dict[str, Any] = None) -> bool:
         """
