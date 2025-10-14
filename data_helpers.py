@@ -7,6 +7,8 @@ animal shelter data for use in the dashboard and rescue type filtering.
 import re
 from collections import Counter
 
+import pandas as pd
+
 
 def parse_age_to_weeks(age_str: str | None) -> float | None:
     """Parse age string to numeric weeks.
@@ -304,3 +306,90 @@ def bucket_categories(
             mapping[value] = 'Other'
 
     return mapping
+
+
+def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalize animal shelter DataFrame with derived fields.
+
+    Applies all normalization helpers to create cleaned, enriched data:
+    - Parses age strings into numeric weeks (age_weeks column)
+    - Extracts sex and intact status (sex, intact_status columns)
+    - Validates coordinates (valid_coords boolean column)
+
+    This is a non-destructive transformation - original columns are preserved
+    and new normalized columns are added alongside them.
+
+    Args:
+        df: Raw animal shelter DataFrame with AAC schema columns
+
+    Returns:
+        Normalized DataFrame with additional columns:
+        - age_weeks: float, age in weeks (None if unparseable)
+        - sex: str, standardized sex (Male/Female/Unknown)
+        - intact_status: str, standardized status
+                        (Intact/Neutered/Spayed/Unknown)
+        - valid_coords: bool, True if coordinates are valid for mapping
+
+    Raises:
+        ValueError: If required columns are missing from DataFrame
+
+    Examples:
+        >>> df = pd.DataFrame({
+        ...     'animal_id': ['A001'],
+        ...     'age_upon_outcome': ['2 years'],
+        ...     'sex_upon_outcome': ['Neutered Male'],
+        ...     'location_lat': [30.2672],
+        ...     'location_long': [-97.7431]
+        ... })
+        >>> normalized = normalize_dataframe(df)
+        >>> normalized['age_weeks'][0]
+        104.286
+        >>> normalized['sex'][0]
+        'Male'
+        >>> normalized['intact_status'][0]
+        'Neutered'
+        >>> normalized['valid_coords'][0]
+        True
+    """
+    # Validate required columns exist
+    required_columns = [
+        'age_upon_outcome',
+        'sex_upon_outcome',
+        'location_lat',
+        'location_long'
+    ]
+
+    missing_columns = [
+        col for col in required_columns if col not in df.columns
+    ]
+
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {', '.join(missing_columns)}"
+        )
+
+    # Create a copy to avoid modifying original DataFrame
+    normalized_df = df.copy()
+
+    # Apply age parsing to create age_weeks column
+    normalized_df['age_weeks'] = normalized_df['age_upon_outcome'].apply(
+        parse_age_to_weeks
+    )
+
+    # Apply sex/intact normalization to create sex and intact_status columns
+    sex_intact_tuples = normalized_df['sex_upon_outcome'].apply(
+        normalize_sex_intact
+    )
+    normalized_df['sex'] = sex_intact_tuples.apply(lambda x: x[0])
+    normalized_df['intact_status'] = sex_intact_tuples.apply(lambda x: x[1])
+
+    # Apply coordinate validation to create valid_coords flag
+    normalized_df['valid_coords'] = normalized_df.apply(
+        lambda row: validate_coordinates(
+            row['location_lat'],
+            row['location_long']
+        ),
+        axis=1
+    )
+
+    return normalized_df

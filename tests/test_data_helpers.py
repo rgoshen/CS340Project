@@ -2,9 +2,12 @@
 
 import unittest
 
+import pandas as pd
+
 from data_helpers import (
     breed_matches_rescue_type,
     bucket_categories,
+    normalize_dataframe,
     normalize_sex_intact,
     parse_age_to_weeks,
     validate_coordinates,
@@ -465,6 +468,222 @@ class TestBucketCategories(unittest.TestCase):
         self.assertIn("B", result)
         self.assertIn("C", result)
         self.assertIn("D", result)
+
+
+class TestNormalizeDataFrame(unittest.TestCase):
+    """Test cases for normalize_dataframe function."""
+
+    def test_basic_normalization(self):
+        """Test basic DataFrame normalization with all valid data."""
+        df = pd.DataFrame({
+            'animal_id': ['A001', 'A002'],
+            'age_upon_outcome': ['2 years', '6 months'],
+            'sex_upon_outcome': ['Neutered Male', 'Intact Female'],
+            'location_lat': [30.2672, 30.5],
+            'location_long': [-97.7431, -97.8]
+        })
+
+        result = normalize_dataframe(df)
+
+        # Check new columns exist
+        self.assertIn('age_weeks', result.columns)
+        self.assertIn('sex', result.columns)
+        self.assertIn('intact_status', result.columns)
+        self.assertIn('valid_coords', result.columns)
+
+        # Check age_weeks values
+        self.assertAlmostEqual(result['age_weeks'].iloc[0], 104.286, places=2)
+        self.assertAlmostEqual(result['age_weeks'].iloc[1], 26.07, places=2)
+
+        # Check sex values
+        self.assertEqual(result['sex'].iloc[0], 'Male')
+        self.assertEqual(result['sex'].iloc[1], 'Female')
+
+        # Check intact_status values
+        self.assertEqual(result['intact_status'].iloc[0], 'Neutered')
+        self.assertEqual(result['intact_status'].iloc[1], 'Intact')
+
+        # Check valid_coords values
+        self.assertTrue(result['valid_coords'].iloc[0])
+        self.assertTrue(result['valid_coords'].iloc[1])
+
+    def test_preserves_original_columns(self):
+        """Test that original columns are preserved (non-destructive)."""
+        df = pd.DataFrame({
+            'animal_id': ['A001'],
+            'age_upon_outcome': ['2 years'],
+            'sex_upon_outcome': ['Neutered Male'],
+            'location_lat': [30.2672],
+            'location_long': [-97.7431]
+        })
+
+        result = normalize_dataframe(df)
+
+        # Original columns should still exist
+        self.assertIn('animal_id', result.columns)
+        self.assertIn('age_upon_outcome', result.columns)
+        self.assertIn('sex_upon_outcome', result.columns)
+        self.assertIn('location_lat', result.columns)
+        self.assertIn('location_long', result.columns)
+
+        # Original values should be unchanged
+        self.assertEqual(result['animal_id'].iloc[0], 'A001')
+        self.assertEqual(result['age_upon_outcome'].iloc[0], '2 years')
+        self.assertEqual(
+            result['sex_upon_outcome'].iloc[0],
+            'Neutered Male'
+        )
+
+    def test_handles_invalid_age_data(self):
+        """Test handling of invalid age data."""
+        df = pd.DataFrame({
+            'animal_id': ['A001', 'A002', 'A003'],
+            'age_upon_outcome': ['invalid', None, ''],
+            'sex_upon_outcome': ['Neutered Male'] * 3,
+            'location_lat': [30.2672] * 3,
+            'location_long': [-97.7431] * 3
+        })
+
+        result = normalize_dataframe(df)
+
+        # Invalid age data should result in None/NaN
+        self.assertTrue(pd.isna(result['age_weeks'].iloc[0]))
+        self.assertTrue(pd.isna(result['age_weeks'].iloc[1]))
+        self.assertTrue(pd.isna(result['age_weeks'].iloc[2]))
+
+    def test_handles_invalid_sex_data(self):
+        """Test handling of invalid sex data."""
+        df = pd.DataFrame({
+            'animal_id': ['A001', 'A002'],
+            'age_upon_outcome': ['2 years'] * 2,
+            'sex_upon_outcome': [None, 'Unknown'],
+            'location_lat': [30.2672] * 2,
+            'location_long': [-97.7431] * 2
+        })
+
+        result = normalize_dataframe(df)
+
+        # Invalid sex data should result in 'Unknown'
+        self.assertEqual(result['sex'].iloc[0], 'Unknown')
+        self.assertEqual(result['intact_status'].iloc[0], 'Unknown')
+        self.assertEqual(result['sex'].iloc[1], 'Unknown')
+        self.assertEqual(result['intact_status'].iloc[1], 'Unknown')
+
+    def test_handles_invalid_coordinates(self):
+        """Test handling of invalid coordinate data."""
+        df = pd.DataFrame({
+            'animal_id': ['A001', 'A002', 'A003'],
+            'age_upon_outcome': ['2 years'] * 3,
+            'sex_upon_outcome': ['Neutered Male'] * 3,
+            'location_lat': [None, 91, 30.2672],
+            'location_long': [-97.7431, -97.7431, -181]
+        })
+
+        result = normalize_dataframe(df)
+
+        # Invalid coordinates should result in False
+        self.assertFalse(result['valid_coords'].iloc[0])  # None lat
+        self.assertFalse(result['valid_coords'].iloc[1])  # lat out of range
+        self.assertFalse(result['valid_coords'].iloc[2])  # lon out of range
+
+    def test_missing_required_column_raises_error(self):
+        """Test that missing required columns raise ValueError."""
+        # Missing age_upon_outcome
+        df = pd.DataFrame({
+            'animal_id': ['A001'],
+            'sex_upon_outcome': ['Neutered Male'],
+            'location_lat': [30.2672],
+            'location_long': [-97.7431]
+        })
+
+        with self.assertRaises(ValueError) as context:
+            normalize_dataframe(df)
+
+        self.assertIn('age_upon_outcome', str(context.exception))
+
+    def test_missing_multiple_required_columns_raises_error(self):
+        """Test error message includes all missing columns."""
+        df = pd.DataFrame({
+            'animal_id': ['A001']
+        })
+
+        with self.assertRaises(ValueError) as context:
+            normalize_dataframe(df)
+
+        error_msg = str(context.exception)
+        self.assertIn('age_upon_outcome', error_msg)
+        self.assertIn('sex_upon_outcome', error_msg)
+        self.assertIn('location_lat', error_msg)
+        self.assertIn('location_long', error_msg)
+
+    def test_does_not_modify_original_dataframe(self):
+        """Test that normalization does not modify the input DataFrame."""
+        df = pd.DataFrame({
+            'animal_id': ['A001'],
+            'age_upon_outcome': ['2 years'],
+            'sex_upon_outcome': ['Neutered Male'],
+            'location_lat': [30.2672],
+            'location_long': [-97.7431]
+        })
+
+        original_columns = df.columns.tolist()
+        original_values = df.to_dict()
+
+        result = normalize_dataframe(df)
+
+        # Original DataFrame should be unchanged
+        self.assertEqual(df.columns.tolist(), original_columns)
+        self.assertEqual(df.to_dict(), original_values)
+
+        # Result should have more columns
+        self.assertGreater(len(result.columns), len(df.columns))
+
+    def test_handles_mixed_valid_invalid_data(self):
+        """Test DataFrame with mix of valid and invalid data."""
+        df = pd.DataFrame({
+            'animal_id': ['A001', 'A002', 'A003'],
+            'age_upon_outcome': ['2 years', 'invalid', '6 months'],
+            'sex_upon_outcome': ['Neutered Male', None, 'Spayed Female'],
+            'location_lat': [30.2672, None, 30.5],
+            'location_long': [-97.7431, -97.8, -181]
+        })
+
+        result = normalize_dataframe(df)
+
+        # First row: all valid
+        self.assertIsNotNone(result['age_weeks'].iloc[0])
+        self.assertEqual(result['sex'].iloc[0], 'Male')
+        self.assertTrue(result['valid_coords'].iloc[0])
+
+        # Second row: invalid age and coords, unknown sex
+        self.assertTrue(pd.isna(result['age_weeks'].iloc[1]))
+        self.assertEqual(result['sex'].iloc[1], 'Unknown')
+        self.assertFalse(result['valid_coords'].iloc[1])
+
+        # Third row: valid age and sex, invalid coords
+        self.assertIsNotNone(result['age_weeks'].iloc[2])
+        self.assertEqual(result['sex'].iloc[2], 'Female')
+        self.assertFalse(result['valid_coords'].iloc[2])
+
+    def test_empty_dataframe(self):
+        """Test normalization of empty DataFrame with correct schema."""
+        df = pd.DataFrame({
+            'age_upon_outcome': [],
+            'sex_upon_outcome': [],
+            'location_lat': [],
+            'location_long': []
+        })
+
+        result = normalize_dataframe(df)
+
+        # Should have all required columns
+        self.assertIn('age_weeks', result.columns)
+        self.assertIn('sex', result.columns)
+        self.assertIn('intact_status', result.columns)
+        self.assertIn('valid_coords', result.columns)
+
+        # Should have no rows
+        self.assertEqual(len(result), 0)
 
 
 if __name__ == '__main__':
