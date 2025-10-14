@@ -4,6 +4,7 @@ import unittest
 
 from data_helpers import (
     breed_matches_rescue_type,
+    bucket_categories,
     normalize_sex_intact,
     parse_age_to_weeks,
     validate_coordinates,
@@ -345,6 +346,79 @@ class TestBreedMatchesRescueType(unittest.TestCase):
         """Test non-string breed returns False."""
         self.assertFalse(breed_matches_rescue_type(123, "water"))
         self.assertFalse(breed_matches_rescue_type([], "water"))
+
+
+class TestBucketCategories(unittest.TestCase):
+    """Test cases for bucket_categories function."""
+
+    def test_basic_bucketing(self):
+        """Test basic bucketing with clear top categories."""
+        values = ["A", "A", "A", "B", "B", "C"]
+        result = bucket_categories(values, top_n=2)
+        self.assertEqual(result["A"], "A")
+        self.assertEqual(result["B"], "B")
+        self.assertEqual(result["C"], "Other")
+
+    def test_deterministic_tie_breaking(self):
+        """Test alphabetical tie-breaking when counts are equal."""
+        values = ["Dog", "Cat", "Bird"]  # All have count 1
+        result = bucket_categories(values, top_n=2)
+        # Bird and Cat should be top 2 (alphabetically first)
+        self.assertEqual(result["Bird"], "Bird")
+        self.assertEqual(result["Cat"], "Cat")
+        self.assertEqual(result["Dog"], "Other")
+
+    def test_all_categories_fit(self):
+        """Test when top_n >= number of unique categories."""
+        values = ["A", "B", "C"]
+        result = bucket_categories(values, top_n=10)
+        self.assertEqual(result["A"], "A")
+        self.assertEqual(result["B"], "B")
+        self.assertEqual(result["C"], "C")
+
+    def test_top_n_one(self):
+        """Test with top_n=1."""
+        values = ["A", "A", "B", "C"]
+        result = bucket_categories(values, top_n=1)
+        self.assertEqual(result["A"], "A")
+        self.assertEqual(result["B"], "Other")
+        self.assertEqual(result["C"], "Other")
+
+    def test_empty_list(self):
+        """Test empty list returns empty dict."""
+        result = bucket_categories([], top_n=5)
+        self.assertEqual(result, {})
+
+    def test_zero_top_n(self):
+        """Test top_n=0 returns empty dict."""
+        values = ["A", "B", "C"]
+        result = bucket_categories(values, top_n=0)
+        self.assertEqual(result, {})
+
+    def test_negative_top_n(self):
+        """Test negative top_n returns empty dict."""
+        values = ["A", "B", "C"]
+        result = bucket_categories(values, top_n=-1)
+        self.assertEqual(result, {})
+
+    def test_duplicate_values_in_list(self):
+        """Test that duplicate values in input are handled correctly."""
+        values = ["A", "A", "A", "B", "B", "C", "D"]
+        result = bucket_categories(values, top_n=2)
+        # A appears 3 times, B appears 2 times - these are top 2
+        self.assertEqual(result["A"], "A")
+        self.assertEqual(result["B"], "B")
+        self.assertEqual(result["C"], "Other")
+        self.assertEqual(result["D"], "Other")
+
+    def test_mapping_includes_all_unique_values(self):
+        """Test that mapping includes all unique values from input."""
+        values = ["A", "A", "B", "C", "D"]
+        result = bucket_categories(values, top_n=2)
+        self.assertIn("A", result)
+        self.assertIn("B", result)
+        self.assertIn("C", result)
+        self.assertIn("D", result)
 
 
 if __name__ == '__main__':
