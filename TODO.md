@@ -248,92 +248,92 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Add comprehensive docstrings
   - [x] Simple credentials for coursework (admin/grazioso2024)
   - [x] Write 42 comprehensive unit tests (all passing)
-- [ ] Design authentication layout (deferred to dashboard notebook)
-  - [ ] Create username input field (dcc.Input)
-  - [ ] Create password input field (dcc.Input, type='password')
-  - [ ] Create submit button (html.Button)
-  - [ ] Add error message placeholder (html.Div)
-  - [ ] Style login form for centered, professional appearance
-- [ ] Add authentication storage (deferred to dashboard notebook)
-  - [ ] Create dcc.Store component for authentication state
-  - [ ] Initialize as not authenticated
-- [ ] Implement authentication callback (deferred to dashboard notebook)
-  - [ ] Input: submit button clicks, username, password
-  - [ ] Use validate_credentials() from dashboard_auth module
-  - [ ] Output: authentication state to dcc.Store
-  - [ ] Output: error message if login fails using get_auth_error_message()
-- [ ] Implement dashboard visibility callback (deferred to dashboard notebook)
-  - [ ] Input: authentication state from dcc.Store
-  - [ ] Use is_authenticated() from dashboard_auth module
-  - [ ] Output: toggle login view vs dashboard view
-  - [ ] Return login layout when not authenticated
-  - [ ] Return full dashboard when authenticated
+- [x] Design authentication layout (implemented in dashboard notebook)
+  - [x] Create username input field (dcc.Input)
+  - [x] Create password input field (dcc.Input, type='password')
+  - [x] Create submit button (html.Button)
+  - [x] Add error message placeholder (html.Div)
+  - [x] Style login form for centered, professional appearance
+- [x] Add authentication storage (implemented in dashboard notebook)
+  - [x] Create dcc.Store component for authentication state
+  - [x] Initialize as not authenticated
+- [x] Implement authentication callback (implemented in dashboard notebook)
+  - [x] Input: submit button clicks, username, password
+  - [x] Use validate_credentials() from dashboard_auth module
+  - [x] Output: authentication state to dcc.Store
+  - [x] Output: error message if login fails using get_auth_error_message()
+- [x] Implement dashboard visibility callback (implemented in dashboard notebook)
+  - [x] Input: authentication state from dcc.Store
+  - [x] Use is_authenticated() from dashboard_auth module
+  - [x] Output: toggle login view vs dashboard view
+  - [x] Return login layout when not authenticated
+  - [x] Return full dashboard when authenticated
 
 ## Phase 4: Dashboard Layout (View)
-- [ ] Implement branding header
-  - [ ] Create html.A link wrapper for logo
-  - [ ] Embed Grazioso-Salvare-Logo.png with base64 encoding
-  - [ ] Add alt text: "Grazioso Salvare Logo"
-  - [ ] Add creator identification: "Dashboard by Rick Goshen"
-  - [ ] Add project context: "CS 340 - Client/Server Development"
-  - [ ] Separate header with html.Hr()
-  - [ ] Apply accessible styling (proper contrast, font sizes)
-- [ ] Implement filter controls
-  - [ ] Create dcc.RadioItems component with id='filter-type'
-  - [ ] Add 4 options: Water Rescue, Mountain/Wilderness Rescue, Disaster/Tracking, Reset
-  - [ ] Set default value to 'reset'
-  - [ ] Add clear labels with rescue type descriptions
-  - [ ] Add help text explaining each filter
-  - [ ] Style for readability and spacing
-- [ ] Enhance data table (keep existing features)
-  - [ ] Verify sorting is enabled (sort_action='native')
-  - [ ] Verify pagination is enabled (page_action='native')
-  - [ ] Verify single-row selection (row_selectable='single')
-  - [ ] Add tooltips for long text fields
-  - [ ] Ensure consistent cell styling
-  - [ ] Keep selected_rows=[0] default
-- [ ] Update map component
-  - [ ] Modify to use derived_virtual_data (filtered data)
-  - [ ] Add coordinate validation before rendering markers
-  - [ ] Add graceful error handling for no valid coordinates
-  - [ ] Add empty state message when no data to display
-  - [ ] Keep existing tooltip and popup functionality
-  - [ ] Ensure map updates on filter changes
-- [ ] Implement second chart component
-  - [ ] Create new html.Div container for chart
-  - [ ] Add clear title describing chart purpose
-  - [ ] Choose chart type: pie or bar (outcome_type distribution)
-  - [ ] Plan for category bucketing (Top 10 + Other)
-  - [ ] Add clear legend and axis labels
-  - [ ] Ensure chart reflects filtered data
-  - [ ] Style for readability (proper sizing, colors)
+- [x] Implement branding header
+  - [x] Create html.A link wrapper for logo
+  - [x] Embed Grazioso-Salvare-Logo.png with base64 encoding
+  - [x] Add alt text: "Grazioso Salvare Logo"
+  - [x] Add creator identification: "Dashboard by Rick Goshen"
+  - [x] Add project context: "CS 340 - Client/Server Development"
+  - [x] Separate header with html.Hr()
+  - [x] Apply accessible styling (proper contrast, font sizes)
+- [x] Implement filter controls
+  - [x] Create dcc.RadioItems component with id='filter-type'
+  - [x] Add 4 options: Water Rescue, Mountain/Wilderness Rescue, Disaster/Tracking, Reset
+  - [x] Set default value to 'reset'
+  - [x] Add clear labels with rescue type descriptions
+  - [x] Add help text explaining each filter
+  - [x] Style for readability and spacing
+- [x] Enhance data table (keep existing features)
+  - [x] Verify sorting is enabled (sort_action='native')
+  - [x] Verify pagination is enabled (page_action='native')
+  - [x] Verify single-row selection (row_selectable='single')
+  - [x] Add tooltips for long text fields
+  - [x] Ensure consistent cell styling
+  - [x] Keep selected_rows=[0] default
+- [x] Update map component
+  - [x] Modify to use derived_virtual_data (filtered data)
+  - [x] Add coordinate validation before rendering markers
+  - [x] Add graceful error handling for no valid coordinates
+  - [x] Add empty state message when no data to display
+  - [x] Keep existing tooltip and popup functionality
+  - [x] Ensure map updates on filter changes
+- [x] Implement second chart component
+  - [x] Create new html.Div container for chart
+  - [x] Add clear title describing chart purpose
+  - [x] Choose chart type: pie chart (outcome_type distribution)
+  - [x] Implement category bucketing (Top 10 + Other)
+  - [x] Add clear legend and labels
+  - [x] Ensure chart reflects filtered data
+  - [x] Style for readability (proper sizing, colors)
 
 ## Phase 5: Controller (Callbacks)
-- [ ] Implement filter callback (update_dashboard)
-  - [ ] Input: filter-type radio button value
-  - [ ] Get normalized DataFrame from cache
-  - [ ] Apply appropriate filter function via dispatcher
-  - [ ] Output: filtered data to datatable-id.data
-  - [ ] Add error handling for filter failures
-  - [ ] Add logging for debugging
-- [ ] Implement chart callback (update_graphs)
-  - [ ] Input: datatable-id.derived_virtual_data
-  - [ ] Extract filtered/sorted data from input
-  - [ ] Apply category bucketing for chart data
-  - [ ] Create pie or bar chart with plotly.express
-  - [ ] Add title indicating current filter state
-  - [ ] Output: dcc.Graph component to graph-id.children
-  - [ ] Handle empty data gracefully
-- [ ] Refine map callback (update_map)
-  - [ ] Keep existing inputs: derived_virtual_data, derived_virtual_selected_rows
-  - [ ] Add coordinate validation before creating markers
-  - [ ] Handle case where selected row has invalid coordinates
-  - [ ] Add fallback message when no valid coordinates
-  - [ ] Keep existing marker tooltip and popup
-  - [ ] Ensure map centers on selected animal location
-- [ ] Verify style callback (update_styles)
-  - [ ] Confirm existing cell highlighting works with filtered data
-  - [ ] No changes needed if working correctly
+- [x] Implement filter callback (update_dashboard)
+  - [x] Input: filter-type radio button value
+  - [x] Get normalized DataFrame from model
+  - [x] Apply appropriate filter function via dispatcher
+  - [x] Output: filtered data to datatable-id.data
+  - [x] Add error handling for filter failures
+  - [x] Add debugging output
+- [x] Implement chart callback (update_graphs)
+  - [x] Input: datatable-id.derived_virtual_data
+  - [x] Extract filtered/sorted data from input
+  - [x] Apply category bucketing for chart data
+  - [x] Create pie chart with plotly.express
+  - [x] Add title "Outcome Type Distribution"
+  - [x] Output: dcc.Graph component to graph-id.children
+  - [x] Handle empty data gracefully
+- [x] Implement map callback (update_map)
+  - [x] Use inputs: derived_virtual_data, derived_virtual_selected_rows
+  - [x] Add coordinate validation before creating markers
+  - [x] Handle case where selected row has invalid coordinates
+  - [x] Add fallback message when no valid coordinates
+  - [x] Implement marker tooltip and popup
+  - [x] Ensure map centers on selected animal location
+- [x] Implement style callback (update_styles)
+  - [x] Highlight selected columns in data table
+  - [x] Works correctly with filtered data
 
 ## Phase 6: Testing & Validation
 - [ ] Manual testing workflow
