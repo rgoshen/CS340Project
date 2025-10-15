@@ -241,22 +241,30 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Write 22 comprehensive unit tests (all passing)
 
 ## Phase 3: Authentication Gate
-- [ ] Design authentication layout
+- [x] Create authentication logic module
+  - [x] Implement validate_credentials() function
+  - [x] Implement get_auth_error_message() function
+  - [x] Implement is_authenticated() function
+  - [x] Add comprehensive docstrings
+  - [x] Simple credentials for coursework (admin/grazioso2024)
+  - [x] Write 42 comprehensive unit tests (all passing)
+- [ ] Design authentication layout (deferred to dashboard notebook)
   - [ ] Create username input field (dcc.Input)
   - [ ] Create password input field (dcc.Input, type='password')
   - [ ] Create submit button (html.Button)
   - [ ] Add error message placeholder (html.Div)
   - [ ] Style login form for centered, professional appearance
-- [ ] Add authentication storage
+- [ ] Add authentication storage (deferred to dashboard notebook)
   - [ ] Create dcc.Store component for authentication state
   - [ ] Initialize as not authenticated
-- [ ] Implement authentication callback
+- [ ] Implement authentication callback (deferred to dashboard notebook)
   - [ ] Input: submit button clicks, username, password
-  - [ ] Validate credentials (simple check for coursework)
+  - [ ] Use validate_credentials() from dashboard_auth module
   - [ ] Output: authentication state to dcc.Store
-  - [ ] Output: error message if login fails
-- [ ] Implement dashboard visibility callback
+  - [ ] Output: error message if login fails using get_auth_error_message()
+- [ ] Implement dashboard visibility callback (deferred to dashboard notebook)
   - [ ] Input: authentication state from dcc.Store
+  - [ ] Use is_authenticated() from dashboard_auth module
   - [ ] Output: toggle login view vs dashboard view
   - [ ] Return login layout when not authenticated
   - [ ] Return full dashboard when authenticated
