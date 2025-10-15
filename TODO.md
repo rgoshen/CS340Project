@@ -336,6 +336,17 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] Works correctly with filtered data
 
 ## Phase 6: Testing & Validation
+- [x] Integration testing
+  - [x] Create integration/ directory structure
+  - [x] Create integration/test_dashboard_workflows.py
+  - [x] Test primary workflow: Reset → Water → Mountain → Disaster (2 tests)
+  - [x] Test authentication flow with state transitions (2 tests)
+  - [x] Test data normalization pipeline from raw to filtered (1 test)
+  - [x] Test category bucketing for chart visualization (1 test)
+  - [x] Test coordinate validation for map rendering (1 test)
+  - [x] All 7 integration tests passing
+  - [x] Mock data used (no database dependencies)
+  - [x] Note: Dash callback I/O testing not included (complex UI simulation)
 - [ ] Manual testing workflow
   - [ ] Test authentication gate (successful and failed login)
   - [ ] Test Reset filter shows all animals
