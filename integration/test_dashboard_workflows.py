@@ -30,7 +30,10 @@ class TestPrimaryWorkflow(unittest.TestCase):
                 'Domestic Shorthair'
             ],
             'name': ['Buddy', 'Max', 'Rex', 'Charlie', 'Duke', 'Mittens'],
-            'age_upon_outcome': ['2 years', '150 weeks', '4 years', '1 year', '2 years', '5 years'],
+            'age_upon_outcome': [
+                '2 years', '150 weeks', '4 years',
+                '1 year', '2 years', '5 years'
+            ],
             'sex_upon_outcome': [
                 'Intact Female',
                 'Intact Male',
@@ -39,9 +42,16 @@ class TestPrimaryWorkflow(unittest.TestCase):
                 'Intact Male',
                 'Spayed Female'
             ],
-            'outcome_type': ['Adoption', 'Transfer', 'Adoption', 'Adoption', 'Transfer', 'Adoption'],
-            'location_lat': [30.267, 30.268, 30.269, 30.270, 30.271, 30.272],
-            'location_long': [-97.743, -97.744, -97.745, -97.746, -97.747, -97.748]
+            'outcome_type': [
+                'Adoption', 'Transfer', 'Adoption',
+                'Adoption', 'Transfer', 'Adoption'
+            ],
+            'location_lat': [
+                30.267, 30.268, 30.269, 30.270, 30.271, 30.272
+            ],
+            'location_long': [
+                -97.743, -97.744, -97.745, -97.746, -97.747, -97.748
+            ]
         })
 
     def test_reset_to_water_to_mountain_to_disaster_workflow(self):
@@ -51,7 +61,9 @@ class TestPrimaryWorkflow(unittest.TestCase):
 
         # Step 1: Reset - should show all animals
         reset_result = apply_rescue_filter(df, 'reset')
-        self.assertEqual(len(reset_result), 6, "Reset should show all 6 animals")
+        self.assertEqual(
+            len(reset_result), 6, "Reset should show all 6 animals"
+        )
 
         # Step 2: Water rescue - should show only water rescue candidates
         water_result = apply_rescue_filter(df, 'water')
@@ -59,7 +71,9 @@ class TestPrimaryWorkflow(unittest.TestCase):
                           "Water filter should reduce dataset")
         # A001: Labrador Female Intact 104 weeks - MATCH
         # A004: Chesapeake Female Intact 52 weeks - MATCH
-        self.assertEqual(len(water_result), 2, "Should find 2 water rescue candidates")
+        self.assertEqual(
+            len(water_result), 2, "Should find 2 water rescue candidates"
+        )
         self.assertIn('A001', water_result['animal_id'].values)
         self.assertIn('A004', water_result['animal_id'].values)
 
@@ -69,7 +83,10 @@ class TestPrimaryWorkflow(unittest.TestCase):
                           "Mountain filter should reduce dataset")
         # A002: German Shepherd Male Intact 150 weeks - MATCH
         # A005: Alaskan Malamute Male Intact 104 weeks - MATCH
-        self.assertEqual(len(mountain_result), 2, "Should find 2 mountain rescue candidates")
+        self.assertEqual(
+            len(mountain_result), 2,
+            "Should find 2 mountain rescue candidates"
+        )
         self.assertIn('A002', mountain_result['animal_id'].values)
         self.assertIn('A005', mountain_result['animal_id'].values)
 
@@ -79,7 +96,10 @@ class TestPrimaryWorkflow(unittest.TestCase):
                           "Disaster filter should reduce dataset")
         # A002: German Shepherd Male Intact 156 weeks - MATCH
         # A003: Doberman Male Intact 208 weeks - MATCH
-        self.assertEqual(len(disaster_result), 2, "Should find 2 disaster rescue candidates")
+        self.assertEqual(
+            len(disaster_result), 2,
+            "Should find 2 disaster rescue candidates"
+        )
         self.assertIn('A002', disaster_result['animal_id'].values)
         self.assertIn('A003', disaster_result['animal_id'].values)
 
@@ -187,13 +207,16 @@ class TestCategoryBucketingWorkflow(unittest.TestCase):
             'animal_id': ['A001', 'A002', 'A003', 'A004', 'A005',
                          'A006', 'A007', 'A008', 'A009', 'A010',
                          'A011', 'A012'],
-            'outcome_type': ['Adoption', 'Adoption', 'Adoption', 'Adoption', 'Adoption',
+            'outcome_type': [
+                           'Adoption', 'Adoption', 'Adoption',
+                           'Adoption', 'Adoption',
                            'Transfer', 'Transfer', 'Transfer',
                            'Return to Owner', 'Return to Owner',
                            'Euthanasia', 'Died']
         })
 
-        # Get outcome counts as a dict (bucket_categories expects dict, not Series)
+        # Get outcome counts as a dict
+        # (bucket_categories expects dict, not Series)
         outcome_counts = data['outcome_type'].value_counts().to_dict()
 
         # Apply bucketing (top 3 + Other)
@@ -202,7 +225,9 @@ class TestCategoryBucketingWorkflow(unittest.TestCase):
         # Verify top 3 are preserved
         self.assertEqual(category_mapping['Adoption'], 'Adoption')
         self.assertEqual(category_mapping['Transfer'], 'Transfer')
-        self.assertEqual(category_mapping['Return to Owner'], 'Return to Owner')
+        self.assertEqual(
+            category_mapping['Return to Owner'], 'Return to Owner'
+        )
 
         # Verify others are bucketed
         self.assertEqual(category_mapping['Euthanasia'], 'Other')
@@ -232,8 +257,10 @@ class TestCoordinateValidationWorkflow(unittest.TestCase):
             'age_upon_outcome': ['2 years'] * 4,
             'sex_upon_outcome': ['Intact Female'] * 4,
             'outcome_type': ['Adoption'] * 4,
-            'location_lat': [30.267, 999.0, None, 30.269],  # Valid, invalid, null, valid
-            'location_long': [-97.743, -97.744, -97.745, 999.0]  # Valid, valid, valid, invalid
+            # Valid, invalid, null, valid
+            'location_lat': [30.267, 999.0, None, 30.269],
+            # Valid, valid, valid, invalid
+            'location_long': [-97.743, -97.744, -97.745, 999.0]
         })
 
         # Normalize data
