@@ -349,6 +349,61 @@ coverage html
 
 **Current Coverage: 77%** of CRUD_Python_Module.py
 
+#### Running Integration Tests
+
+The project includes 7 integration tests for dashboard workflows that validate the complete data pipeline from database to filters to visualizations.
+
+**Running integration tests:**
+```bash
+# Run all integration tests
+python -m unittest discover -s integration -p "test_*.py"
+
+# Run with verbose output
+python -m unittest discover -s integration -p "test_*.py" -v
+
+# Run specific test file
+python -m unittest integration.test_dashboard_workflows
+
+# Run specific test class
+python -m unittest integration.test_dashboard_workflows.TestPrimaryWorkflow
+```
+
+**Test Structure:**
+- `integration/test_dashboard_workflows.py` - Complete workflow integration tests (7 tests)
+  - Primary workflow: Reset → Water → Mountain → Disaster (2 tests)
+  - Authentication flow with state transitions (2 tests)
+  - Data normalization pipeline from raw to filtered (1 test)
+  - Category bucketing for chart visualization (1 test)
+  - Coordinate validation for map rendering (1 test)
+
+**Total: 7 integration tests, all passing**
+
+**What Integration Tests Cover:**
+- ✅ Complete data pipeline workflows (Database → Normalization → Filtering)
+- ✅ Primary filter sequence: Reset → Water → Mountain → Disaster
+- ✅ Filter results composition (correct sex, breed, age criteria)
+- ✅ Authentication flow and session state management
+- ✅ Data normalization end-to-end (raw AAC data → normalized fields)
+- ✅ Category bucketing for charts (top-N + "Other")
+- ✅ Coordinate validation for map rendering
+- ✅ Mock data used (no database dependencies in CI)
+
+**What Is NOT Tested (and Why):**
+
+Integration tests focus on **data pipeline correctness**, not UI rendering. The following are intentionally excluded due to complexity vs. value trade-offs:
+
+- **Dash Callback I/O Simulation**: Requires complex mocking of Dash context, callback_context, and State/Input/Output decorators. Manual testing provides better coverage for UI interactions.
+- **Dashboard Layout Rendering**: Component composition is declarative and static; visual testing is more appropriate than programmatic assertions.
+- **Map Marker Positioning**: Leaflet map behavior is tested by the library itself; we validate coordinate data correctness instead.
+- **Chart Visual Appearance**: Plotly chart rendering is validated by the library; we test data transformation correctness.
+
+**Testing Strategy:**
+- **Unit Tests (129 tests)**: Test individual functions in isolation (filters, normalization, bucketing, auth)
+- **Integration Tests (7 tests)**: Test complete workflows end-to-end with mock data
+- **Manual Testing**: Validate UI rendering, interactivity, and user experience in Jupyter
+
+For detailed rationale on integration test scope, see the **Phase 6: Testing & Validation** section in [SUMMARY.md](SUMMARY.md).
+
 ### Code Quality & Linting
 
 This project uses **ruff** for fast Python linting and code quality checks.

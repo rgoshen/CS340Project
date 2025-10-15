@@ -683,6 +683,154 @@ All dashboard components implemented in single Jupyter cell:
 
 ---
 
+### Phase 6: Integration Testing - COMPLETED (2025-01-14)
+
+**Branch:** `feature/phase6-integration-tests`
+
+**Goal:** Implement integration tests for dashboard workflows to verify end-to-end data pipeline functionality without requiring live database or browser simulation.
+
+#### Integration Test Suite
+
+**Created:** `integration/test_dashboard_workflows.py` - 7 comprehensive integration tests
+
+**Test Classes:**
+
+1. **TestPrimaryWorkflow** (2 tests)
+   - `test_reset_to_water_to_mountain_to_disaster_workflow`: Verifies primary filter sequence
+   - `test_filter_results_have_correct_composition`: Validates filtered data correctness
+   - Tests complete workflow: Reset → Water → Mountain → Disaster
+   - Verifies row counts change as expected with each filter
+   - Validates composition (breed, sex, intact status match filter criteria)
+
+2. **TestAuthenticationFlow** (2 tests)
+   - `test_login_failure_to_success_workflow`: Tests failed → successful login
+   - `test_session_state_workflow`: Tests authentication state transitions
+   - Validates credential checking (wrong, empty, correct)
+   - Tests session state management (False → True → invalid)
+
+3. **TestDataNormalizationPipeline** (1 test)
+   - `test_raw_to_normalized_to_filtered_pipeline`: End-to-end data flow
+   - Tests raw data → normalize_dataframe() → apply_rescue_filter()
+   - Verifies age conversion (years/months → weeks)
+   - Verifies sex/intact parsing ("Intact Female" → sex + intact_status)
+   - Validates filters work correctly with normalized data
+
+4. **TestCategoryBucketingWorkflow** (1 test)
+   - `test_outcome_type_bucketing_workflow`: Chart data preparation
+   - Tests bucket_categories() with outcome types
+   - Verifies top N categories preserved
+   - Verifies low-frequency categories grouped as "Other"
+   - Validates chart data structure for pie chart
+
+5. **TestCoordinateValidationWorkflow** (1 test)
+   - `test_valid_and_invalid_coordinates_workflow`: Map data validation
+   - Tests mix of valid/invalid/null coordinates
+   - Verifies filters don't exclude animals with bad coords (table shows all)
+   - Validates only valid coords should render on map
+   - Tests graceful handling of coordinate edge cases
+
+**Test Data:**
+- Mock dataset with 6 animals matching AAC schema
+- Mix of dogs and cats
+- Various breeds, ages, sexes, intact statuses
+- Valid and invalid coordinates
+- No database connection required (offline testing)
+
+**Test Coverage:** 7 tests, all passing in 0.006s
+
+**What Is Tested:**
+- ✅ Complete data pipeline: Database → Normalization → Filtering
+- ✅ Authentication credential validation and state management
+- ✅ Filter correctness: breed, sex, intact status, age ranges
+- ✅ Primary workflow sequence with expected row counts
+- ✅ Data normalization (age parsing, sex/intact parsing)
+- ✅ Category bucketing for chart visualization
+- ✅ Coordinate validation for map rendering
+- ✅ Graceful handling of invalid/missing data
+
+**What Is NOT Tested (and Why):**
+
+**Dash Callback I/O Simulation:**
+- Dash callbacks return complex component structures (dl.Map, dcc.Graph, html.Div)
+- Testing callback outputs requires:
+  - Simulating Dash's callback context and state management
+  - Mocking Plotly figure objects and Leaflet map components
+  - Validating component property structures (non-trivial)
+  - Browser rendering simulation (beyond unit/integration scope)
+- **Rationale**: These are UI component tests requiring Dash test framework or browser automation (Selenium)
+- **Alternative**: Manual testing in Jupyter validates UI behavior (Phase 6 manual testing)
+
+**Dashboard Layout Rendering:**
+- Testing that layouts render correctly requires browser simulation
+- Component property validation is complex and fragile (changes with Dash versions)
+- **Rationale**: Manual testing in actual dashboard environment is more reliable
+
+**Map Marker Positioning:**
+- Testing exact map marker positions requires:
+  - Leaflet library internals knowledge
+  - Geographic coordinate projection calculations
+  - Zoom level and viewport calculations
+- **Rationale**: Coordinate validation tests (included) ensure data correctness; actual rendering tested manually
+
+**Chart Visual Appearance:**
+- Testing chart colors, labels, legends requires:
+  - Plotly figure object deep inspection
+  - Visual regression testing tools
+- **Rationale**: Category bucketing tests ensure data correctness; visual appearance tested manually
+
+**Complexity vs. Value Trade-off:**
+- Dash callback simulation requires extensive mocking infrastructure
+- UI component testing is brittle and maintenance-heavy
+- Integration tests focus on **data pipeline correctness** (high value, low complexity)
+- Manual testing covers **UI behavior** (medium value, requires human verification)
+- Together they provide comprehensive validation
+
+**Testing Strategy:**
+- **Unit tests** (tests/): Test individual functions in isolation (129 tests total)
+- **Integration tests** (integration/): Test data pipeline workflows (7 tests)
+- **Manual testing**: Validate UI rendering and user interactions (Phase 6)
+
+#### CI/CD Integration
+
+**Updated:** `.github/workflows/on-pr.yml` - Pull request workflow
+
+**Changes:**
+- Added integration test step to PR workflow
+- PR workflow now runs: Linters → Unit Tests → Integration Tests → Coverage
+- Ensures all 7 integration tests pass before PR can be merged
+- No database required (tests use mock data)
+- Fast execution adds minimal overhead to CI pipeline
+
+**CI Test Sequence:**
+1. **Linting**: `ruff check .` (code quality validation)
+2. **Unit Tests**: `python -m unittest discover -s tests` (129 tests)
+3. **Integration Tests**: `python -m unittest discover -s integration` (7 tests)
+4. **Coverage**: Coverage report for CRUD module
+
+**Rationale:**
+- Integration tests validate complete workflows before merge
+- Catches data pipeline regressions early
+- Mock data ensures CI remains fast and offline-capable
+- Complements unit tests by testing end-to-end flows
+
+**Phase 6 Status:** ✅ COMPLETE (Integration Tests + CI Integration)
+
+All integration tests implemented and passing:
+- ✅ 7 comprehensive integration tests
+- ✅ Mock data (no database dependencies)
+- ✅ Tests complete data pipeline
+- ✅ Validates primary workflows
+- ✅ Fast execution (0.006s)
+- ✅ CI-ready (offline, reproducible)
+- ✅ Integrated into PR workflow (auto-runs on all PRs)
+
+**Branch:** `feature/phase6-integration-tests`
+**Commits:** 1 commit completing integration test suite + CI integration
+
+**Note:** Manual testing workflow remains in Phase 6 TODO for UI validation in Jupyter environment.
+
+---
+
 ### Future Phases (Planned)
-- Phase 6: Testing and validation
+- Phase 6: Manual testing and validation (UI testing)
 - Phase 7: Documentation and cleanup
