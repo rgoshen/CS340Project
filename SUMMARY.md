@@ -339,8 +339,78 @@ All helper functions implemented and tested:
 
 **Note:** DataFrame caching deferred to dashboard implementation (Phase 4/5) where it will be needed.
 
+---
+
+### Phase 2: Rescue Type Filter Logic - COMPLETED (2025-01-14)
+
+**Branch:** `feature/phase2-rescue-filters`
+
+**Goal:** Implement pure filter functions for each rescue type and a dispatcher to apply the correct filter.
+
+#### Filter Functions Implementation
+
+**Created:** `rescue_filters.py` module with rescue type filtering logic
+
+**Completed Functions:**
+
+1. **water_rescue_filter()** - Water Rescue Candidate Filter
+   - Filters for breeds: Labrador Retriever Mix, Chesapeake Bay Retriever, Newfoundland
+   - Requires: Intact Female
+   - Age range: 26-156 weeks
+   - Returns filtered DataFrame
+   - 4 comprehensive unit tests (all passing)
+
+2. **mountain_rescue_filter()** - Mountain/Wilderness Rescue Candidate Filter
+   - Filters for breeds: German Shepherd, Alaskan Malamute, Old English Sheepdog, Siberian Husky, Rottweiler
+   - Requires: Intact Male
+   - Age range: 26-156 weeks
+   - Returns filtered DataFrame
+   - 3 comprehensive unit tests (all passing)
+
+3. **disaster_rescue_filter()** - Disaster/Tracking Rescue Candidate Filter
+   - Filters for breeds: Doberman Pinscher, German Shepherd, Golden Retriever, Bloodhound, Rottweiler
+   - Requires: Intact Male
+   - Age range: 20-300 weeks
+   - Returns filtered DataFrame
+   - 3 comprehensive unit tests (all passing)
+
+4. **reset_filter()** - Reset to Full Dataset
+   - Returns entire DataFrame unchanged (no filtering)
+   - Used for "Reset" button in dashboard
+   - 2 comprehensive unit tests (all passing)
+
+5. **apply_rescue_filter()** - Filter Type Dispatcher
+   - Maps filter type strings to appropriate filter function
+   - Supports aliases: "wilderness" → mountain, "tracking" → disaster
+   - Case-insensitive and whitespace-tolerant
+   - Validates filter type and raises ValueError for invalid types
+   - Returns filtered DataFrame
+   - 10 comprehensive unit tests (all passing)
+
+**Test Coverage:** 22 tests passing for rescue_filters module (4 + 3 + 3 + 2 + 10)
+
+**Implementation Highlights:**
+- Pure functions with no side effects
+- Expect normalized DataFrames with sex, intact_status, age_weeks columns
+- Breed matching uses substring matching (case-insensitive) to handle "Mix" and multi-breed strings
+- All filters return empty DataFrame when no matches found (graceful handling)
+- Comprehensive error messages for invalid filter types
+
+**Phase 2 Status:** ✅ COMPLETE
+
+All rescue filter functions implemented and tested:
+- ✅ water_rescue_filter() - Water rescue candidates (4 tests)
+- ✅ mountain_rescue_filter() - Mountain/wilderness rescue candidates (3 tests)
+- ✅ disaster_rescue_filter() - Disaster/tracking rescue candidates (3 tests)
+- ✅ reset_filter() - Full dataset reset (2 tests)
+- ✅ apply_rescue_filter() - Filter dispatcher with aliases (10 tests)
+
+**Branch:** `feature/phase2-rescue-filters`
+**Commits:** 1 commit completing rescue filter implementation
+
+---
+
 ### Future Phases (Planned)
-- Phase 2: Rescue type filter logic
 - Phase 3: Authentication gate for dashboard
 - Phase 4: Dashboard layout and UI components
 - Phase 5: Interactive callbacks and controller logic
