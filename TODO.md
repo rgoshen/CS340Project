@@ -211,31 +211,34 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [ ] Cache normalized DataFrame at module level (deferred to dashboard implementation)
 
 ## Phase 2: Rescue Type Filter Logic
-- [ ] Implement water_rescue_filter() function
-  - [ ] Filter breeds: Labrador Retriever Mix, Chesapeake Bay Retriever, Newfoundland
-  - [ ] Filter sex: Intact Female
-  - [ ] Filter age: 26-156 weeks
-  - [ ] Return filtered DataFrame
-  - [ ] Add docstring with filter criteria
-- [ ] Implement mountain_rescue_filter() function
-  - [ ] Filter breeds: German Shepherd, Alaskan Malamute, Old English Sheepdog, Siberian Husky, Rottweiler
-  - [ ] Filter sex: Intact Male
-  - [ ] Filter age: 26-156 weeks
-  - [ ] Return filtered DataFrame
-  - [ ] Add docstring with filter criteria
-- [ ] Implement disaster_rescue_filter() function
-  - [ ] Filter breeds: Doberman Pinscher, German Shepherd, Golden Retriever, Bloodhound, Rottweiler
-  - [ ] Filter sex: Intact Male
-  - [ ] Filter age: 20-300 weeks
-  - [ ] Return filtered DataFrame
-  - [ ] Add docstring with filter criteria
-- [ ] Implement reset_filter() function
-  - [ ] Return full normalized DataFrame (no filtering)
-  - [ ] Add docstring
-- [ ] Create apply_filter() dispatcher function
-  - [ ] Map filter type string to appropriate filter function
-  - [ ] Handle invalid filter types gracefully
-  - [ ] Return filtered DataFrame
+- [x] Implement water_rescue_filter() function
+  - [x] Filter breeds: Labrador Retriever Mix, Chesapeake Bay Retriever, Newfoundland
+  - [x] Filter sex: Intact Female
+  - [x] Filter age: 26-156 weeks
+  - [x] Return filtered DataFrame
+  - [x] Add docstring with filter criteria
+- [x] Implement mountain_rescue_filter() function
+  - [x] Filter breeds: German Shepherd, Alaskan Malamute, Old English Sheepdog, Siberian Husky, Rottweiler
+  - [x] Filter sex: Intact Male
+  - [x] Filter age: 26-156 weeks
+  - [x] Return filtered DataFrame
+  - [x] Add docstring with filter criteria
+- [x] Implement disaster_rescue_filter() function
+  - [x] Filter breeds: Doberman Pinscher, German Shepherd, Golden Retriever, Bloodhound, Rottweiler
+  - [x] Filter sex: Intact Male
+  - [x] Filter age: 20-300 weeks
+  - [x] Return filtered DataFrame
+  - [x] Add docstring with filter criteria
+- [x] Implement reset_filter() function
+  - [x] Return full normalized DataFrame (no filtering)
+  - [x] Add docstring
+- [x] Create apply_rescue_filter() dispatcher function
+  - [x] Map filter type string to appropriate filter function
+  - [x] Handle invalid filter types gracefully
+  - [x] Return filtered DataFrame
+  - [x] Support aliases: wilderness→mountain, tracking→disaster
+  - [x] Case-insensitive and whitespace-tolerant input
+  - [x] Write 22 comprehensive unit tests (all passing)
 
 ## Phase 3: Authentication Gate
 - [ ] Design authentication layout
