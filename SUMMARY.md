@@ -1339,6 +1339,191 @@ The best long-term solution would be to NOT recreate the input components on eve
 
 ---
 
+## Bugfix: Authentication Input State Persistence (2025-10-15)
+
+### Problem Description
+
+During manual testing of authentication error handling (MANUAL_TESTING_PLAN.md Test 2.2), discovered that after entering an incorrect password and receiving an error message, correcting the password and attempting to login again resulted in the error "Username and password are required" even though both fields contained valid values.
+
+**User Experience:**
+1. User enters username: `admin`, password: `wrongpassword` → Click Login
+2. Dashboard shows error: "Invalid username or password." ✅ (Correct)
+3. User corrects password to `grazioso2024` → Click Login
+4. Dashboard shows error: "Username and password are required." ❌ (Incorrect - fields have values!)
+
+### Root Cause Analysis
+
+The original implementation had a fundamental architecture issue with how authentication was handled:
+
+**Original Approach (Broken):**
+```python
+# Callback regenerated auth_layout on every error
+def get_auth_layout(error_msg=''):
+    return html.Div([
+        # ... login form with Input components
+    ])
+
+@app.callback(Output('auth-state', 'data'), ...)
+def authenticate_user(n_clicks, username, password):
+    if validate_credentials(username, password):
+        return {'authenticated': True, 'error': ''}
+    else:
+        return {'authenticated': False, 'error': error_msg}
+
+@app.callback(Output('page-content', 'children'), ...)
+def display_page(auth_state):
+    if is_authenticated(auth_state):
+        return dashboard_layout
+    else:
+        error_msg = auth_state.get('error', '')
+        return get_auth_layout(error_msg)  # RECREATES COMPONENTS!
+```
+
+**The Problem:**
+1. When `display_page` returned `get_auth_layout(error_msg)`, it **destroyed and recreated** the entire login form
+2. New Input components with IDs `username-input` and `password-input` were created fresh
+3. On the next login button click, Dash passed the State values from these **newly created components**
+4. Because the components were just created, their values were `None` or not yet initialized
+5. The `authenticate_user` callback received `None` for both username and password
+6. The auth module's `get_auth_error_message(None, None)` returned "Username and password are required."
+
+**Previous Attempted Fix (Inadequate):**
+An earlier fix tried to convert `None` to `''`:
+```python
+if username is None:
+    username = ''
+if password is None:
+    password = ''
+```
+
+This didn't work because it still allowed the inputs to be destroyed/recreated, causing the underlying issue to persist.
+
+### Solution Implemented
+
+**New Approach: Persistent Components with CSS Toggle**
+
+Instead of swapping DOM elements, keep both login and dashboard in the DOM at all times and toggle visibility with CSS:
+
+```python
+# Main layout has both screens always present
+app.layout = html.Div([
+    dcc.Store(id='auth-state', data={'authenticated': False}),
+
+    # Login Container (always in DOM, visibility toggled)
+    html.Div(id='login-container', children=[...], style={'display': 'block'}),
+
+    # Dashboard Container (always in DOM, visibility toggled)
+    html.Div(id='dashboard-container', children=dashboard_layout, style={'display': 'none'})
+])
+
+# Authentication callback updates state and error message separately
+@app.callback(
+    [Output('auth-state', 'data'),
+     Output('login-error', 'children')],  # Direct output to error div
+    [Input('login-button', 'n_clicks')],
+    [State('username-input', 'value'),
+     State('password-input', 'value')]
+)
+def authenticate_user(n_clicks, username, password):
+    if n_clicks == 0:
+        return {'authenticated': False}, ''
+
+    if validate_credentials(username, password):
+        return {'authenticated': True}, ''
+    else:
+        error_msg = get_auth_error_message(username, password)
+        return {'authenticated': False}, error_msg
+
+# Visibility toggle using CSS display property
+@app.callback(
+    [Output('login-container', 'style'),
+     Output('dashboard-container', 'style')],
+    [Input('auth-state', 'data')]
+)
+def toggle_screens(auth_state):
+    if is_authenticated(auth_state):
+        return {'display': 'none'}, {'display': 'block'}  # Hide login, show dashboard
+    else:
+        return {'display': 'block'}, {'display': 'none'}  # Show login, hide dashboard
+```
+
+**Why This Works:**
+
+1. **Input components never destroyed**: Login form stays in DOM, just hidden with `display: none`
+2. **State preserved**: Input values persist between login attempts because components are never recreated
+3. **Direct error updates**: Error message updates via direct callback output to `login-error` div, not by regenerating parent
+4. **Clean separation**: Authentication state management separate from UI visibility management
+
+### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+**Architecture changes:**
+- Removed `get_auth_layout()` function that dynamically generated login form
+- Moved login form into `app.layout` as static `login-container` div
+- Added `dashboard-container` div to layout (both containers always present)
+- Modified `authenticate_user` callback to output to both `auth-state` and `login-error`
+- Replaced `display_page` callback with `toggle_screens` that manages CSS visibility
+- Both screens present in DOM at all times, toggled with `display: block/none`
+
+### Testing Results
+
+**Manual Testing (All Scenarios Pass):**
+- ✅ First login with wrong password → Shows "Invalid username or password."
+- ✅ Second login with correct password → Successfully authenticates and shows dashboard
+- ✅ Empty username/password → "Username and password are required."
+- ✅ Empty username only → "Username is required."
+- ✅ Empty password only → "Password is required."
+- ✅ Wrong credentials → "Invalid username or password."
+- ✅ Correct credentials (admin/grazioso2024) → Dashboard loads successfully
+- ✅ No notebook restart required between login attempts
+- ✅ Input field values persist between failed login attempts
+
+**Integration Test Coverage:**
+- Existing integration tests continue to pass (auth module unit tests)
+- No changes needed to `test_dashboard_auth.py` (underlying validation logic unchanged)
+
+### Technical Decisions
+
+**Why not use `dcc.Store` for input values?**
+- Unnecessary complexity - CSS visibility toggle is simpler and standard
+- Input components already maintain their own state when not destroyed
+- Store would add extra callbacks and synchronization logic
+
+**Why keep both screens in DOM?**
+- Modern browsers handle hidden DOM efficiently
+- Eliminates component lifecycle issues
+- Standard pattern for single-page applications
+- Better performance (no DOM recreation on state changes)
+
+**Impact on single-cell requirement:**
+- No impact - all code remains in single Jupyter cell
+- Only architectural restructuring, not code splitting
+
+### Branch and Commit Info
+
+**Branch:** `fix/auth-input-state-persistence`
+**Files Modified:** `ProjectTwoDashboard.ipynb`
+**Status:** ✅ COMPLETE - Tested and working
+
+### Lesson Learned
+
+**Dash Component Lifecycle:** When Dash callbacks return new component trees with the same IDs, those components are destroyed and recreated. This resets their internal state, causing State parameters in callbacks to receive `None` or default values.
+
+**Best Practice:** For forms or inputs that need to persist across state changes:
+1. Keep components in the DOM permanently
+2. Use CSS visibility (`display`, `visibility`, or conditional styling) to show/hide
+3. Never recreate input components in callback returns if you need their values in subsequent callbacks
+4. Reserve dynamic component generation for truly dynamic content (lists, tables, etc.)
+
+This pattern is especially important for:
+- Login forms
+- Multi-step wizards
+- Forms with conditional sections
+- Any UI requiring persistent user input across state transitions
+
+---
+
 ### Future Phases (Planned)
-- Phase 6: Manual testing and validation (UI testing)
+- Phase 6: Manual testing and validation (UI testing) - IN PROGRESS
 - Phase 7: Documentation and cleanup
