@@ -347,32 +347,40 @@ All CRUD operations implemented, tested, and documented according to requirement
   - [x] All 7 integration tests passing
   - [x] Mock data used (no database dependencies)
   - [x] Note: Dash callback I/O testing not included (complex UI simulation)
-- [ ] Manual testing workflow
-  - [ ] Test authentication gate (successful and failed login)
-  - [ ] Test Reset filter shows all animals
-  - [ ] Test Water Rescue filter and verify row count
-  - [ ] Test Mountain/Wilderness Rescue filter and verify row count
-  - [ ] Test Disaster/Tracking filter and verify row count
-  - [ ] Verify each filter shows correct breeds/sex/age ranges
-  - [ ] Test table row selection updates map marker
-  - [ ] Test table row selection updates map center
-  - [ ] Verify chart updates with each filter change
-  - [ ] Test pagination with filtered data
-  - [ ] Test sorting with filtered data
-- [ ] Data quality testing
-  - [ ] Test age parsing with sample records from each format
-  - [ ] Test breed matching with multi-breed strings
-  - [ ] Test coordinate validation with edge cases
-  - [ ] Test with null/missing values in all normalized fields
-  - [ ] Verify category bucketing produces Top N + Other correctly
-- [ ] UI/UX validation
-  - [ ] Verify logo displays with proper alt text
-  - [ ] Check all labels are clear and descriptive
-  - [ ] Verify font sizes are legible
-  - [ ] Check color contrast meets accessibility standards
-  - [ ] Verify consistent spacing throughout dashboard
-  - [ ] Test responsive layout (if applicable)
-  - [ ] Verify all interactive elements provide feedback
+- [x] Manual testing workflow - ✅ COMPLETED (2025-10-15)
+  - [x] Test authentication gate (successful and failed login)
+  - [x] Test Reset filter shows all animals
+  - [x] Test Water Rescue filter and verify row count
+  - [x] Test Mountain/Wilderness Rescue filter and verify row count
+  - [x] Test Disaster/Tracking filter and verify row count
+  - [x] Verify each filter shows correct breeds/sex/age ranges
+  - [x] Test table row selection updates map marker
+  - [x] Test table row selection updates map center
+  - [x] Verify chart updates with each filter change
+  - [x] Test pagination with filtered data
+  - [x] Test sorting with filtered data
+  - [x] Test row highlighting on selection
+  - [x] Test row highlighting clears on page navigation
+  - [x] Test map shows message when no row selected
+  - [x] **Bugs Fixed During Manual Testing:**
+    - [x] Authentication input state persistence (PR #25)
+    - [x] Filter reset pagination and selection (PR #24)
+    - [x] Row highlighting persistence across pagination (PR #28)
+    - [x] Map showing default marker when no row selected (PR #29)
+- [x] Data quality testing - ✅ COMPLETED (validated via integration tests)
+  - [x] Test age parsing with sample records from each format
+  - [x] Test breed matching with multi-breed strings
+  - [x] Test coordinate validation with edge cases
+  - [x] Test with null/missing values in all normalized fields
+  - [x] Verify category bucketing produces Top N + Other correctly
+- [x] UI/UX validation - ✅ COMPLETED (2025-10-15)
+  - [x] Verify logo displays with proper alt text
+  - [x] Check all labels are clear and descriptive
+  - [x] Verify font sizes are legible
+  - [x] Check color contrast meets accessibility standards (pale green #D4EDDA)
+  - [x] Verify consistent spacing throughout dashboard
+  - [x] Test responsive layout (if applicable)
+  - [x] Verify all interactive elements provide feedback
 
 ## Phase 7: Documentation & Cleanup
 - [ ] Code documentation
