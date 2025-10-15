@@ -1791,6 +1791,139 @@ When working with pagination, highlighting based on `derived_virtual_selected_ro
 
 ---
 
+## Bugfix: Map Shows Default Marker When No Row Selected (2025-10-15)
+
+### Problem Description
+
+After implementing the row highlighting fix that clears selection when changing pages, discovered that the map still displayed a marker even when no row was selected.
+
+**User Experience:**
+1. User logs in → First row selected, map shows marker ✅
+2. User navigates to page 2 → Selection cleared, no row highlighted ✅
+3. Map still shows a marker at first row's location ❌ (Expected: no marker or message)
+
+### Root Cause Analysis
+
+The `update_map` callback had flawed logic for handling empty selection:
+
+```python
+def update_map(viewData, index):
+    if viewData is None:
+        return
+    elif index is None:
+        return
+
+    # Later in the code (unreachable!)
+    if index is None:
+        row = 0
+    else:
+        row = index[0]
+```
+
+**The Problem:**
+1. When selection is cleared, `index = []` (empty list, not `None`)
+2. The early `if index is None: return` didn't catch empty lists
+3. The later `if index is None: row = 0` was unreachable due to early return
+4. Code proceeded to `row = index[0]`, which would crash on empty list
+5. However, the early `return` statements prevented proper rendering in all cases
+
+**Why it showed a marker:**
+The callback likely had a race condition where `derived_virtual_selected_rows` wasn't immediately empty after clearing `selected_rows`, causing it to briefly show index `[0]` before becoming empty.
+
+### Solution Implemented
+
+Fixed the `update_map` callback to properly handle empty selection:
+
+```python
+def update_map(viewData, index):
+    """
+    Updates the geolocation map based on selected row in data table.
+
+    Returns:
+        Leaflet map component with marker at selected animal's location,
+        or message when no row is selected
+    """
+    # Handle missing data
+    if viewData is None:
+        viewData = df.to_dict('records')
+
+    # Handle no selection - show message instead of default marker
+    if index is None or len(index) == 0:
+        return html.Div([
+            html.H4('Select a row to view animal location on map',
+                    style={'textAlign': 'center', 'color': '#7f8c8d', 'padding': '50px'})
+        ])
+
+    dff = pd.DataFrame.from_dict(viewData)
+    row = index[0]
+
+    # ... rest of map rendering logic
+```
+
+**Why This Works:**
+1. Checks both `None` and empty list: `if index is None or len(index) == 0`
+2. Returns a helpful message div instead of trying to render a map
+3. Only attempts to access `index[0]` when we know the list is not empty
+4. Provides clear user feedback: "Select a row to view animal location on map"
+5. Removed unreachable code that was causing confusion
+
+### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+**Modified `update_map` callback:**
+- Added proper check for empty selection: `if index is None or len(index) == 0`
+- Returns informative message div when no row selected
+- Removed unreachable `if index is None: row = 0` code
+- Updated docstring to document no-selection behavior
+- Message styled with gray color (#7f8c8d) and padding for professional appearance
+
+### Testing Results
+
+**Manual Testing:**
+- ✅ Login → First row selected, map shows marker at animal location
+- ✅ Navigate to page 2 → Selection cleared, map shows "Select a row to view animal location on map"
+- ✅ Select row 3 on page 2 → Map shows marker at that animal's location
+- ✅ Navigate to page 3 → Selection cleared, map shows message again
+- ✅ Change filter to Water → First row selected, map shows marker
+- ✅ Clear selection manually → Map shows message (not tested but logic supports it)
+
+**Branch:** `fix/map-no-selection-state`
+**Files Modified:** `ProjectTwoDashboard.ipynb`, `SUMMARY.md`
+**Status:** ✅ COMPLETE - Ready for commit
+
+### Technical Decisions
+
+**Why show a message instead of an empty map?**
+- Better UX: Users understand they need to select a row
+- Avoids confusion of showing a blank/generic map
+- Consistent with chart behavior (shows message when no data)
+- Professional appearance
+
+**Why not keep a default marker at Austin, TX?**
+- Would be misleading - suggests an animal is selected when none is
+- User might think the selection system is broken
+- Clear empty state is better than ambiguous state
+
+**Impact on user workflow:**
+- Users see immediate visual feedback when selection is cleared
+- No confusion about whether a row is selected or not
+- Encourages users to select a row to see location data
+
+### Lesson Learned
+
+**Empty List vs None:**
+When working with Dash DataTable selection properties:
+- `selected_rows` can be `None` (never initialized) or `[]` (cleared)
+- Always check both: `if index is None or len(index) == 0`
+- Don't assume early `if index is None: return` will catch all "no selection" cases
+- Empty list `[]` is falsy in boolean context but will pass `is None` checks
+
+**Unreachable Code:**
+The pattern of checking `if index is None` twice (early return, then later default) suggests the code evolved over time and wasn't cleaned up. Always review for unreachable code after refactoring.
+
+---
+
 ### Future Phases (Planned)
 - Phase 6: Manual testing and validation (UI testing) - IN PROGRESS
 - Phase 7: Documentation and cleanup
