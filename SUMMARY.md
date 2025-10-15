@@ -1924,6 +1924,99 @@ The pattern of checking `if index is None` twice (early return, then later defau
 
 ---
 
+## Bugfix: Add Creator Identifier to Login Page (2025-10-15)
+
+**Branch:** `fix/login-page-creator-identifier`
+**PR:** TBD
+
+**Goal:** Add creator identification (Rick Goshen, CS 340) to login page to match dashboard branding.
+
+### Problem
+
+The login page displayed:
+
+- Grazioso Salvare Logo ✅
+- "Grazioso Salvare Dashboard Login" title ✅
+- Missing: Creator identification (Rick Goshen, CS 340)
+
+The authenticated dashboard header included:
+
+- Logo ✅
+- "Dashboard by Rick Goshen" ✅
+- "CS 340 - Client/Server Development" ✅
+
+The login page lacked this creator identification, creating an inconsistent branding experience.
+
+### Solution
+
+Added creator identification to the login page layout in `app.layout`:
+
+```python
+html.Div(id='login-container', children=[
+    html.Div([
+        html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()),
+                 alt='Grazioso Salvare Logo',
+                 style={'height': '100px', 'display': 'block', 'margin': '20px auto'}),
+        html.H2('Grazioso Salvare Dashboard Login',
+                style={'textAlign': 'center', 'color': '#2c3e50'}),
+        # Added creator identification
+        html.P('Dashboard by Rick Goshen',
+               style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#7f8c8d'}),
+        html.P('CS 340 - Client/Server Development',
+               style={'textAlign': 'center', 'color': '#95a5a6', 'fontSize': '14px'}),
+        html.Hr(),
+        # ... login form continues
+    ])
+])
+```
+
+### Changes
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+**Login page layout modifications:**
+
+- Added "Dashboard by Rick Goshen" paragraph with italic styling, centered, gray color (#7f8c8d)
+- Added "CS 340 - Client/Server Development" paragraph with centered, smaller font (14px), light gray (#95a5a6)
+- Positioned between dashboard title and horizontal rule for consistent layout
+
+**Styling details:**
+
+- Matches dashboard header styling exactly
+- Maintains professional appearance
+- Provides proper attribution and course context
+
+### Testing
+
+**Manual Testing:**
+
+- ✅ Login page displays logo
+- ✅ Login page shows "Grazioso Salvare Dashboard Login" title
+- ✅ Login page shows "Dashboard by Rick Goshen" in italic
+- ✅ Login page shows "CS 340 - Client/Server Development" in smaller font
+- ✅ Styling matches dashboard header (consistent branding)
+- ✅ Layout is centered and professional
+- ✅ Login functionality unaffected
+
+**Branch:** `fix/login-page-creator-identifier`
+**Files Modified:** `ProjectTwoDashboard.ipynb`
+**Status:** ✅ COMPLETE - Ready for commit
+
+### Impact
+
+**User Experience:**
+
+- Consistent branding across login and dashboard screens
+- Clear attribution to creator (Rick Goshen)
+- Professional appearance maintained throughout application
+- Improved visual continuity
+
+### Key Takeaway
+
+When implementing authentication gates with separate login and dashboard layouts, ensure all branding elements (logos, creator info, course context) are present in both views for a consistent user experience.
+
+---
+
 ### Future Phases (Planned)
 - Phase 6: Manual testing and validation (UI testing) - IN PROGRESS
 - Phase 7: Documentation and cleanup
