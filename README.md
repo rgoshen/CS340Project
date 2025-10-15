@@ -10,6 +10,7 @@
 - [Grazioso Rescue Finder](#grazioso-rescue-finder)
   - [About the Project](#about-the-project)
   - [Motivation](#motivation)
+  - [System Architecture](#system-architecture)
   - [CRUD Operations](#crud-operations)
     - [Create Operation](#create-operation)
     - [Read Operation](#read-operation)
@@ -22,7 +23,8 @@
     - [Required Tools](#required-tools)
     - [Installation Commands](#installation-commands)
   - [Usage](#usage)
-    - [Code Example](#code-example)
+    - [CRUD Module Code Example](#crud-module-code-example)
+    - [Dashboard Usage](#dashboard-usage)
     - [Tests](#tests)
     - [Screenshots](#screenshots)
       - [Module Setup and Import](#module-setup-and-import)
@@ -43,16 +45,38 @@
       - [Delete Operation with Non-Matching Query (No Documents Deleted)](#delete-operation-with-non-matching-query-no-documents-deleted)
       - [Delete Multiple Documents](#delete-multiple-documents)
       - [Test Teardown - Cleanup Test Data](#test-teardown---cleanup-test-data)
-  - [Roadmap/Features (Optional)](#roadmapfeatures-optional)
+  - [Features](#features)
   - [Contact](#contact)
 
 ## About the Project
 
-This application streamlines the identification of rescue dog candidates for Grazioso Salvare by providing database-driven search and categorization tools. Using Austin Animal Center shelter data, the system filters dogs by age, breed, and rescue specialization (water, mountain, disaster, tracking) through a Python/MongoDB backend and interactive web dashboard.
+This full-stack application streamlines the identification of rescue dog candidates for Grazioso Salvare through a Python/MongoDB backend and interactive Dash/Plotly web dashboard. Using Austin Animal Center shelter data, the system provides CRUD operations for data management and real-time filtering by rescue specialization (water, mountain, disaster, tracking) based on breed, sex, age, and intact status. The dashboard features authentication, interactive data tables, geolocation maps, and outcome distribution visualizations.
 
 ## Motivation
 
 Grazioso Salvare needs an efficient way to identify dogs with the right characteristics for search-and-rescue training from thousands of shelter animals across the Austin area. Manual review of shelter records is time-consuming and inconsistent. This system automates the candidate identification process, enabling trainers to quickly locate dogs that match specific rescue profiles—ultimately getting more qualified animals into life-saving training programs faster while giving shelter dogs a second chance at purposeful work.
+
+## System Architecture
+
+This project follows a Model-View-Controller (MVC) architecture:
+
+**Model (Data Layer):**
+- MongoDB database (aac.animals collection)
+- AnimalShelter CRUD module (CRUD_Python_Module.py)
+- Data normalization functions (data_helpers.py)
+- Rescue filter logic (rescue_filters.py)
+
+**View (Presentation Layer):**
+- Interactive Dash/Plotly web dashboard (ProjectTwoDashboard.ipynb)
+- Authentication gate with login form
+- Filtered data table with sorting and pagination
+- Geolocation map showing animal locations
+- Pie chart showing outcome type distribution
+
+**Controller (Business Logic):**
+- Dash callbacks coordinating user interactions
+- Filter dispatchers applying rescue criteria
+- Authentication validation (dashboard_auth.py)
 
 ## CRUD Operations
 
@@ -154,11 +178,11 @@ To get a local copy of this CRUD module up and running, follow these simple step
 
 ## Quick Start
 
-1. Download the CRUD_Python_Module.py, requirements.txt and ProjectOneTestScript.ipynb files to your local development environment
+1. Download all project files to your local development environment
 2. Install required dependencies:
 
     ```bash
-        pip3 install -r requirements.txt
+    pip3 install -r requirements.txt
     ```
 
 3. Start Jupyter Notebook:
@@ -167,9 +191,18 @@ To get a local copy of this CRUD module up and running, follow these simple step
     jupyter notebook
     ```
 
-4. Double click on the ProjectOneTestScript.ipynb and run all the cells in order.
+**To run the CRUD module tests:**
 
-That's it! You now have a working CRUD module ready for animal shelter data operations.
+- Open `ProjectOneTestScript.ipynb` and run all cells
+
+**To run the interactive dashboard:**
+
+- Open `ProjectTwoDashboard.ipynb` and run the cell
+- Login with credentials: `admin` / `grazioso2024`
+- Use rescue type filters to identify candidate animals
+- Click table rows to view animal locations on the map
+
+That's it! You now have a working full-stack application for identifying rescue dog candidates.
 
 ## Installation
 
@@ -216,7 +249,7 @@ mongosh --eval "db.runCommand('ismaster')"
 
 This section demonstrates how the CRUD Python module works and provides examples of its functionality.
 
-### Code Example
+### CRUD Module Code Example
 
 ```python
 # Import the CRUD module
@@ -284,6 +317,36 @@ print(f"Deleted {delete_count} record(s)")
 delete_count = shelter.delete({"outcome_type": "Transfer"})
 print(f"Deleted {delete_count} transfer record(s)")
 ```
+
+### Dashboard Usage
+
+The interactive dashboard provides a web-based interface for identifying rescue candidates:
+
+**Starting the Dashboard:**
+
+```python
+# Open ProjectTwoDashboard.ipynb in Jupyter Notebook
+# Run the cell - dashboard opens in new browser tab
+```
+
+**Authentication:**
+
+- Username: `admin`
+- Password: `grazioso2024`
+
+**Using Rescue Filters:**
+
+1. **Water Rescue** - Filters for Labrador, Chesapeake Bay Retriever, Newfoundland (Intact Female, 26-156 weeks)
+2. **Mountain/Wilderness** - Filters for German Shepherd, Alaskan Malamute, Old English Sheepdog, Siberian Husky, Rottweiler (Intact Male, 26-156 weeks)
+3. **Disaster/Tracking** - Filters for Doberman Pinscher, German Shepherd, Golden Retriever, Bloodhound, Rottweiler (Intact Male, 20-300 weeks)
+4. **Reset** - Shows all animals
+
+**Dashboard Features:**
+
+- **Interactive Table**: Sort, paginate, and select animals
+- **Geolocation Map**: View selected animal's location with breed tooltip and name popup
+- **Outcome Chart**: Pie chart showing distribution of outcome types for filtered data
+- **Row Highlighting**: Selected row highlighted in pale green for easy identification
 
 ### Tests
 
@@ -600,11 +663,38 @@ print(f"Delete test removed {delete_count} record(s)")
 
 ![Test Teardown - Cleanup Test Data](./screenshots/test_teardown.jpg)
 
-## Roadmap/Features
+## Features
 
-- Dashboard
-  - Interactive data table
-  - Geolocation chart
+**Backend (CRUD Module):**
+
+- ✅ Create, Read, Update, Delete operations for MongoDB
+- ✅ Comprehensive error handling and validation
+- ✅ 77% test coverage with 158 unit tests
+
+**Dashboard (Interactive Web UI):**
+
+- ✅ Authentication gate with username/password
+- ✅ Four rescue type filters (Water, Mountain, Disaster, Reset)
+- ✅ Interactive data table with sorting and pagination
+- ✅ Geolocation map with animal location markers
+- ✅ Outcome type distribution pie chart
+- ✅ Row highlighting for selected animals
+- ✅ Responsive empty states
+
+**Data Processing:**
+
+- ✅ Age normalization (parse to weeks from years/months/days)
+- ✅ Sex and intact status parsing
+- ✅ Coordinate validation for mapping
+- ✅ Breed matching with multi-breed support
+- ✅ Category bucketing for chart readability
+
+**Testing & CI/CD:**
+
+- ✅ 158 unit tests (77% coverage)
+- ✅ 7 integration tests (workflow validation)
+- ✅ GitHub Actions CI/CD with automated testing
+- ✅ Ruff linting with PEP 8 compliance
 
 ## Contact
 
