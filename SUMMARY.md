@@ -919,6 +919,135 @@ def display_page(auth_state):
 
 ---
 
+### Dashboard Fix: Initial Layout and Error Message Persistence - COMPLETED (2025-01-14)
+
+**Branch:** `fix/dashboard-initial-layout`
+**PR:** #23 (pending)
+
+**Goal:** Fix blank white screen on dashboard load and error message not displaying on authentication failure.
+
+#### Problem 1: Blank White Screen on Dashboard Load
+
+**Issue:**
+- Dashboard displayed blank white screen at http://127.0.0.1:8050
+- No login form visible to user
+- Network response showed: `{"props":{"children":null,"id":"page-content"}}`
+
+**Root Cause:**
+- Initial `app.layout` had `page-content` div with no children: `html.Div(id='page-content')`
+- The `display_page` callback should populate it, but wasn't firing on initial load
+- User saw completely blank page with no way to login
+
+**Solution:**
+- Added `children=auth_layout` to initial page-content div
+- Changed from: `html.Div(id='page-content')`
+- Changed to: `html.Div(id='page-content', children=get_auth_layout())`
+- Now login form displays immediately on page load
+
+#### Problem 2: Error Message Not Displaying on Bad Credentials
+
+**Issue:**
+- When entering incorrect credentials, no error message displayed to user
+- Page remained unchanged with no feedback
+- User had no way to know why login failed
+
+**Root Cause: React Component Re-render Race Condition**
+
+When bad credentials were entered:
+1. `authenticate_user` callback set two outputs:
+   - `auth-state.data` = `{'authenticated': False}`
+   - `login-error.children` = "Invalid username or password."
+2. Setting `auth-state` triggered `display_page` callback
+3. `display_page` returned entire `auth_layout` with fresh component instances
+4. Fresh components had empty initial values, wiping out the error message just set
+
+**Evidence:**
+User provided network responses showing:
+- First POST: Set both auth-state and error message correctly
+- Second POST: Re-rendered page-content with auth_layout, creating new empty components
+
+**Solution: Store Error in dcc.Store**
+
+Modified the architecture to store error message in `dcc.Store` so it survives re-renders:
+
+1. **Updated `dcc.Store` to include error**:
+   ```python
+   dcc.Store(id='auth-state', data={'authenticated': False, 'error': ''})
+   ```
+
+2. **Created `get_auth_layout()` function**:
+   ```python
+   def get_auth_layout(error_msg=''):
+       """Generate authentication layout with optional error message."""
+       # Returns auth layout with error_msg displayed in login-error div
+   ```
+
+3. **Modified `authenticate_user` callback**:
+   - Changed from 2 outputs to 1 output (only `auth-state`)
+   - Stores error in auth-state dict: `{'authenticated': False, 'error': error_msg}`
+   - No longer outputs directly to `login-error` div
+
+4. **Updated `display_page` callback**:
+   - Extracts error from auth-state: `error_msg = auth_state.get('error', '')`
+   - Calls `get_auth_layout(error_msg)` to render with error message
+   - Error persists through re-render because it's in Store
+
+**How It Works Now:**
+1. User enters bad credentials and clicks Login
+2. `authenticate_user` sets: `{'authenticated': False, 'error': 'Invalid username or password.'}`
+3. This triggers `display_page` callback
+4. `display_page` reads error from auth-state and passes to `get_auth_layout()`
+5. Auth layout renders with error message visible
+6. Error persists because it's stored in dcc.Store component
+
+**Error Messages:**
+- Both empty: "Username and password are required."
+- Empty username: "Username is required."
+- Empty password: "Password is required."
+- Wrong credentials: "Invalid username or password."
+
+#### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+1. **Modified dcc.Store** to include error field:
+   - Before: `data={'authenticated': False}`
+   - After: `data={'authenticated': False, 'error': ''}`
+
+2. **Converted auth_layout to function** `get_auth_layout(error_msg='')`:
+   - Accepts error message parameter
+   - Returns auth layout with error displayed in login-error div
+
+3. **Updated initial page-content**:
+   - Before: `html.Div(id='page-content')`
+   - After: `html.Div(id='page-content', children=get_auth_layout())`
+
+4. **Modified authenticate_user callback**:
+   - Before: 2 outputs (`auth-state`, `login-error`)
+   - After: 1 output (`auth-state` with error included)
+
+5. **Updated display_page callback**:
+   - Extracts error from auth-state
+   - Calls `get_auth_layout(error_msg)` to render with error
+
+#### Testing
+
+**Manual Testing Scenarios:**
+- ✅ Dashboard loads with login form visible (not blank screen)
+- ✅ Wrong username/password → "Invalid username or password."
+- ✅ Empty username and password → "Username and password are required."
+- ✅ Empty username only → "Username is required."
+- ✅ Empty password only → "Password is required."
+- ✅ Correct credentials → Dashboard displays successfully
+
+**Branch:** `fix/dashboard-initial-layout`
+**Commits:** 2 commits (initial layout fix + error persistence fix)
+**Status:** Ready for testing and PR
+
+**Lesson Learned:** Dash callbacks that return entire layouts with component instances will reset component values. Store critical state in `dcc.Store` components to persist across re-renders.
+
+---
+
 ### Future Phases (Planned)
 - Phase 6: Manual testing and validation (UI testing)
 - Phase 7: Documentation and cleanup
