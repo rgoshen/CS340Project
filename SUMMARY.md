@@ -1524,6 +1524,273 @@ This pattern is especially important for:
 
 ---
 
+## Bugfix: Filter Reset Pagination and Selection (2025-10-15)
+
+### Problem Description
+
+During manual testing, discovered that when changing filters, the table did not reset to the first page with the first row selected. Instead, it maintained the previous pagination state and row selection.
+
+**User Experience:**
+1. User navigates to page 3 and selects row 25
+2. User changes filter from "Reset" to "Water Rescue"
+3. Table shows filtered data but remains on page 3 with row 25 selected (if it exists)
+4. Expected behavior: Table should reset to page 1 with first row selected
+
+### Root Cause Analysis
+
+The `update_dashboard` callback only returned one output - the filtered data to the DataTable:
+
+```python
+@app.callback(
+    Output('datatable-id', 'data'),
+    [Input('filter-type', 'value')]
+)
+def update_dashboard(filter_type):
+    filtered_df = apply_rescue_filter(df, filter_type)
+    return filtered_df.to_dict('records')  # Only updates data, not page or selection
+```
+
+When the filter changed, only the DataTable's `data` property updated. The `page_current` and `selected_rows` properties remained unchanged, causing the table to stay on the same page with the same row selection.
+
+### Solution Implemented
+
+Modified the `update_dashboard` callback to return multiple outputs:
+
+```python
+@app.callback(
+    [Output('datatable-id', 'data'),
+     Output('datatable-id', 'page_current'),
+     Output('datatable-id', 'selected_rows')],
+    [Input('filter-type', 'value')]
+)
+def update_dashboard(filter_type):
+    try:
+        filtered_df = apply_rescue_filter(df, filter_type)
+        # Return filtered data, reset to page 0, and select first row
+        return filtered_df.to_dict('records'), 0, [0]
+    except Exception as e:
+        print(f"Error in filter callback: {e}")
+        # Return full dataset on error, reset to page 0, select first row
+        return df.to_dict('records'), 0, [0]
+```
+
+**Why This Works:**
+1. Filter changes trigger the callback
+2. Callback applies the appropriate filter to get filtered DataFrame
+3. Returns three values simultaneously:
+   - Filtered data (updates table content)
+   - `0` for `page_current` (resets to first page)
+   - `[0]` for `selected_rows` (selects first row)
+4. User always sees the start of the filtered results with first row selected
+
+### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+**Modified `update_dashboard` callback:**
+- Changed from single Output to list of three Outputs
+- Added `page_current` output (always returns 0)
+- Added `selected_rows` output (always returns [0])
+- Added error handling with same reset behavior on exceptions
+
+### Testing Results
+
+**Manual Testing:**
+- ✅ Navigate to page 3, select row 25 → Change to Water filter → Table resets to page 1, row 1 selected
+- ✅ Navigate to page 2, select row 15 → Change to Mountain filter → Table resets to page 1, row 1 selected
+- ✅ Navigate to page 5, select row 42 → Change to Reset filter → Table resets to page 1, row 1 selected
+- ✅ All filter transitions now reset pagination and selection correctly
+
+**Branch:** `fix/filter-reset-pagination-selection`
+**Files Modified:** `ProjectTwoDashboard.ipynb`
+**Status:** ✅ COMPLETE - Merged to main
+
+### Lesson Learned
+
+Dash callbacks can return multiple outputs to update multiple component properties simultaneously. This is essential for coordinating related UI state changes (like resetting pagination when data changes).
+
+---
+
+## Bugfix: Row Highlighting Persistence Across Pagination (2025-10-15)
+
+### Problem Description
+
+During manual testing, discovered two related issues with row highlighting:
+
+**Issue 1: Selected rows not visually highlighted**
+- When selecting a row, it was not highlighted with any background color
+- User had no visual feedback indicating which row was selected
+- Manual test plan specified selected rows should be highlighted
+
+**Issue 2: Highlighting persists across page changes**
+- After fixing Issue 1 by adding highlighting, discovered that when selecting row 2 on page 1, navigating to page 2 would keep row 2 highlighted even though it represented a different animal
+- The highlight was tied to the row index within the page, not the specific data row
+- User would see incorrect visual feedback suggesting the wrong animal was selected
+
+### Root Cause Analysis
+
+**Issue 1 Root Cause:**
+The DataTable had no `style_data_conditional` property to apply highlighting styles based on selection state.
+
+**Issue 2 Root Cause:**
+The highlighting callback used `derived_virtual_selected_rows`, which gives row indices relative to the current page view. However, the DataTable's `selected_rows` property maintains absolute row indices in the full dataset. When navigating pages:
+
+1. User selects row 1 on page 1 → `selected_rows = [1]`
+2. User navigates to page 2
+3. DataTable still has `selected_rows = [1]` (globally row 1 is still selected)
+4. `derived_virtual_selected_rows` calculates: "Is global row 1 visible on current page?"
+5. If yes, returns `[1]` (row index 1 within current page view)
+6. Highlighting callback applies highlight to row index 1 on the new page
+7. Row 1 on page 2 gets highlighted, even though it's a different animal
+
+### Solution Implemented
+
+**Part 1: Add Row Highlighting (Initial Fix)**
+
+Added a callback to apply conditional styling based on selected rows:
+
+```python
+@app.callback(
+    Output('datatable-id', 'style_data_conditional'),
+    [Input('datatable-id', 'derived_virtual_selected_rows')]
+)
+def highlight_selected_row(derived_virtual_selected_rows):
+    """Highlight the selected row with pale green background (current page only)."""
+    if derived_virtual_selected_rows is None or len(derived_virtual_selected_rows) == 0:
+        return []
+
+    return [{
+        'if': {'row_index': derived_virtual_selected_rows[0]},
+        'backgroundColor': '#D4EDDA',
+        'color': '#155724'
+    }]
+```
+
+This fixed Issue 1 but introduced Issue 2.
+
+**Part 2: Clear Selection on Page Change (First Attempt - Failed)**
+
+Attempted to clear selection when page changes:
+
+```python
+@app.callback(
+    Output('datatable-id', 'selected_rows', allow_duplicate=True),
+    [Input('datatable-id', 'page_current')],
+    prevent_initial_call=True
+)
+def clear_selection_on_page_change(page_current):
+    return []
+```
+
+**Problem:** This cleared the selection even on initial dashboard load, removing the default first-row selection that should appear when logging in.
+
+**Part 3: Track Page Changes (Final Fix - Works)**
+
+Added state tracking to distinguish between actual page changes and initial load:
+
+```python
+# Added to app.layout
+dcc.Store(id='previous-page', data=0)
+
+# Updated callback
+@app.callback(
+    [Output('datatable-id', 'selected_rows', allow_duplicate=True),
+     Output('previous-page', 'data')],
+    [Input('datatable-id', 'page_current')],
+    [State('previous-page', 'data'),
+     State('datatable-id', 'selected_rows')],
+    prevent_initial_call=True
+)
+def clear_selection_on_page_change(current_page, previous_page, current_selection):
+    """Clear row selection when user navigates to a different page."""
+    # Only clear if this is an actual page change (not initial load or filter change)
+    if previous_page != current_page:
+        # Clear selection and update previous page tracker
+        return [], current_page
+    else:
+        # No change, keep current selection
+        return current_selection, current_page
+```
+
+**Why This Works:**
+1. Tracks the previous page number in a `dcc.Store` component
+2. On initial dashboard load, `prevent_initial_call=True` prevents callback from firing
+3. First row remains selected by default (defined in DataTable `selected_rows=[0]`)
+4. When user changes pages, callback compares current_page vs previous_page
+5. If different, clears selection and updates tracker
+6. If same (e.g., filter change that resets to page 0), preserves selection
+7. Filter callback sets `selected_rows=[0]`, so changing filters still selects first row
+
+### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+**Added to app.layout:**
+- `dcc.Store(id='previous-page', data=0)` to track last page number
+
+**Added `highlight_selected_row` callback:**
+- Listens to `derived_virtual_selected_rows`
+- Returns `style_data_conditional` with pale green background (#D4EDDA)
+- Dark green text (#155724) for contrast
+- Applies to row at index in `derived_virtual_selected_rows[0]`
+
+**Added `clear_selection_on_page_change` callback:**
+- Listens to `page_current` changes
+- Uses State to compare current vs previous page
+- Clears `selected_rows` only on actual page navigation
+- Updates `previous-page` Store with current page number
+- Uses `allow_duplicate=True` since `selected_rows` also modified by filter callback
+- Uses `prevent_initial_call=True` to preserve initial selection
+
+### Testing Results
+
+**Manual Testing:**
+- ✅ Login → First row selected and highlighted with pale green
+- ✅ Select row 2 → Row 2 highlighted
+- ✅ Select row 2 on page 1 → Navigate to page 2 → No row highlighted (selection cleared)
+- ✅ Navigate back to page 1 → No row highlighted (must manually select)
+- ✅ Change filter → Table resets to page 1, row 1 selected and highlighted
+- ✅ Navigate to page 3, change filter → Table resets to page 1, row 1 selected and highlighted
+- ✅ Color is pale green, professional appearance, good contrast
+
+**Branch:** `fix/highlight-selected-row`
+**Files Modified:** `ProjectTwoDashboard.ipynb`
+**Status:** ✅ COMPLETE - Ready for commit
+
+### Technical Decisions
+
+**Why clear selection on page change instead of tracking animal ID?**
+- Simpler implementation (no need to find matching animal on new page)
+- Clearer UX: User knows they need to select a row on each page
+- Avoids confusion when same animal might appear on multiple pages (unlikely but possible with sorting)
+- Standard data table behavior in many UIs
+
+**Why use `dcc.Store` instead of callback-internal state?**
+- Dash callbacks are stateless
+- Cannot track previous values between invocations without external storage
+- `dcc.Store` is the standard Dash pattern for persisting state across callbacks
+
+**Why `allow_duplicate=True`?**
+- Both `update_dashboard` (filter callback) and `clear_selection_on_page_change` modify `selected_rows`
+- Without this, Dash would raise an error about duplicate outputs
+- This flag tells Dash to allow both callbacks to update the same Output
+
+**Impact on user workflow:**
+- Slight change: User must reselect a row when changing pages
+- Benefit: Clear, unambiguous row selection with no false positives
+- Acceptable for coursework scope
+
+### Lesson Learned
+
+**DataTable Selection Properties:**
+- `selected_rows`: Absolute row indices in full dataset (persists across pagination)
+- `derived_virtual_selected_rows`: Row indices relative to current page view (calculated from `selected_rows`)
+- `derived_virtual_data`: Currently visible data after filtering/sorting/pagination
+
+When working with pagination, highlighting based on `derived_virtual_selected_rows` can cause indices to persist incorrectly across pages. Best practice is to clear selection on page navigation or track by unique data identifiers (like animal_id) rather than row indices.
+
+---
+
 ### Future Phases (Planned)
 - Phase 6: Manual testing and validation (UI testing) - IN PROGRESS
 - Phase 7: Documentation and cleanup
