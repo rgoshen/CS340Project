@@ -1048,6 +1048,190 @@ Modified the architecture to store error message in `dcc.Store` so it survives r
 
 ---
 
+### Dashboard Fix: Charts Not Rendering on Initial Load - COMPLETED (2025-01-14)
+
+**Branch:** `fix/charts-initial-render`
+**PR:** TBD
+
+**Goal:** Fix pie chart and geolocation map not displaying when dashboard loads after successful login, and fix map marker not updating position after popup interaction.
+
+#### Problem 1: Charts Not Displaying After Login
+
+**Issue:**
+- After successful login, data table displays correctly
+- Pie chart and geolocation map do not render (empty divs)
+- User sees only the data table, missing the visualizations
+
+**Initial Root Cause:**
+When the dashboard first loads after login, the `derived_virtual_data` property of the DataTable is `None` because:
+1. The table component is newly rendered in the DOM
+2. No filter has been applied yet
+3. Dash hasn't populated `derived_virtual_data` on initial render
+
+Both `update_graphs()` and `update_map()` callbacks were checking:
+```python
+if viewData is None or len(viewData) == 0:
+    return html.Div([html.H4('No data to display', ...)])
+```
+
+This caused them to return empty state messages instead of rendering the charts with the full dataset.
+
+#### Problem 2: Multiple Callback Errors on Initial Load
+
+**Issue:**
+After adding the fallback for `viewData is None`, additional callback errors prevented rendering:
+
+1. **`update_styles` callback crash (500 error):**
+   - `selected_columns` was `None` on initial render
+   - Callback tried to iterate over `None`: `for i in selected_columns`
+   - Solution: Added None check: `if selected_columns is None: selected_columns = []`
+
+2. **`update_graphs` callback type error:**
+   - `bucket_categories()` received pandas Series instead of list
+   - Function validation `if not values:` fails on Series (ambiguous truth value)
+   - Solution: Convert to list before calling: `outcome_values = dff['outcome_type'].tolist()`
+
+3. **Missing Leaflet CSS:**
+   - Map component requires external Leaflet CSS to render
+   - Solution: Added `app.css.append_css({'external_url': 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'})`
+
+#### Problem 3: Map Marker Position Not Updating After Popup Interaction
+
+**Issue:**
+After all rendering issues were fixed, a critical bug remained:
+- Without clicking marker: Marker updates position correctly when selecting different rows
+- After clicking marker (opens popup): When selecting a different row, map zooms/centers but marker stays at old position until clicked again
+- This is a **critical bug** that will fail instructor testing
+
+**Root Cause:**
+Once a Leaflet marker's popup is opened (even if subsequently closed), Leaflet maintains internal state that prevents the marker from updating its position when the map component rerenders. The marker data (breed, name) updates correctly, but the position doesn't update until the marker is clicked again.
+
+**Attempted Solutions (Failed):**
+
+1. **Adding `key` prop to `dl.Marker`:**
+   ```python
+   dl.Marker(position=[...], key=f"marker-{row}", children=[...])
+   ```
+   - **Result:** 500 Internal Server Error in map callback
+   - **Reason:** `dash-leaflet`'s `dl.Marker` component does not support the `key` parameter
+   - Browser console showed: "Callback error updating map-id.children"
+
+2. **Formatting/Indentation variations:**
+   - Multiple attempts to adjust code formatting thinking syntax issues
+   - All resulted in either 500 errors or no map rendering
+   - Issue was not formatting - `key` prop simply not supported
+
+**Final Solution: Unique Map ID (WORKS):**
+
+Instead of trying to force marker remount with `key`, we force the entire `dl.Map` component to remount by giving it a unique `id` based on the selected animal:
+
+```python
+# Use animal_id to create unique map ID to force remount when row changes
+animal_id = str(dff.iloc[row].get('animal_id', row))
+map_key = f"map-{animal_id}"
+
+return [
+    dl.Map(id=map_key, style={'width': '1000px', 'height': '500px'},
+           center=[...], zoom=10, children=[...])
+]
+```
+
+**Why This Works:**
+- Each row selection creates a `dl.Map` with a different `id` (e.g., "map-A123456", "map-B789012")
+- React sees this as a completely different component (different key)
+- Entire map component unmounts and remounts with fresh state
+- All Leaflet internal state (including popup positions) resets
+- Marker appears at correct position immediately, even after previous popup interaction
+
+**Trade-offs:**
+- **Pro:** Completely solves the marker position bug
+- **Pro:** Simple, reliable solution that works with dash-leaflet API
+- **Con:** Slight performance overhead from remounting entire map component (negligible for single-page dashboard)
+- **Con:** Map briefly flickers during remount (acceptable for coursework)
+
+#### Changes Made
+
+**Updated:** `ProjectTwoDashboard.ipynb`
+
+1. **Modified `update_styles()` callback:**
+   - Added None check: `if selected_columns is None: selected_columns = []`
+   - Prevents crash when no columns selected on initial render
+
+2. **Modified `update_graphs()` callback:**
+   - Added fallback: `if viewData is None: viewData = df.to_dict('records')`
+   - Fixed type error: `outcome_values = dff['outcome_type'].tolist()` (convert Series to list)
+   - Separated None check from empty check
+   - Chart now renders with full dataset on initial load
+
+3. **Added Leaflet CSS:**
+   - Added after app initialization: `app.css.append_css({'external_url': 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'})`
+   - Required for dash-leaflet map rendering
+
+4. **Modified `update_map()` callback:**
+   - Added fallback: `if viewData is None: viewData = df.to_dict('records')`
+   - **Added unique map ID generation:**
+     ```python
+     animal_id = str(dff.iloc[row].get('animal_id', row))
+     map_key = f"map-{animal_id}"
+     return [dl.Map(id=map_key, ...)]
+     ```
+   - Forces complete map remount on row selection
+   - Fixes marker position update bug after popup interaction
+
+#### How It Works Now
+
+**Initial Dashboard Load (after login):**
+1. `display_page` callback renders `dashboard_layout` with DataTable
+2. DataTable has `data` property populated with `df.to_dict('records')`
+3. DataTable has `derived_virtual_data = None` initially
+4. `update_styles()` handles `selected_columns = None` gracefully
+5. `update_graphs()` callback fires with `viewData = None`
+   - Fallback to full dataset: `viewData = df.to_dict('records')`
+   - Converts outcome types to list before bucketing
+   - Renders pie chart with all outcome types
+6. `update_map()` callback fires with `viewData = None`
+   - Fallback to full dataset: `viewData = df.to_dict('records')`
+   - Creates map with unique ID based on first animal
+   - Renders map centered on first animal (row 0)
+
+**Row Selection:**
+1. User clicks different row in table
+2. `update_map()` fires with new row index
+3. Generates new unique map ID: `map-{new_animal_id}`
+4. Returns completely new `dl.Map` component
+5. React unmounts old map, mounts new map
+6. Marker appears at correct position immediately
+7. **Works correctly even if previous marker's popup was opened**
+
+**Filter Applied:**
+1. User selects a rescue type filter
+2. `update_dashboard()` callback updates DataTable `data`
+3. DataTable updates `derived_virtual_data` with filtered records
+4. `update_graphs()` and `update_map()` use `derived_virtual_data` (not None anymore)
+5. Charts update to show filtered data
+
+#### Testing Results
+
+**Manual Testing Scenarios:**
+- ✅ Login → Dashboard displays with table, pie chart, AND map
+- ✅ Pie chart shows outcome type distribution for all animals
+- ✅ Map shows marker for first animal in table
+- ✅ Select row without clicking marker → Marker updates position correctly
+- ✅ Click marker to open popup → Marker updates position when selecting new row
+- ✅ Close popup, select new row → Marker updates position correctly
+- ✅ Apply Water filter → Charts update to show filtered data
+- ✅ Apply Mountain filter → Charts update to show filtered data
+- ✅ Apply Disaster filter → Charts update to show filtered data
+- ✅ Reset filter → Charts show all animals again
+
+**Branch:** `fix/charts-initial-render`
+**Commits:** 1 commit with all chart rendering fixes including unique map ID solution
+**Status:** ✅ COMPLETE - Ready for PR
+
+**Technical Note:** This is a common Dash pattern - `derived_virtual_data` is `None` on initial component render and only gets populated after user interactions (sorting, filtering, pagination). Callbacks should always handle `None` gracefully with fallbacks. For Leaflet maps with interactive elements like popups, component remounting via unique IDs is the most reliable way to ensure state resets correctly.
+
+---
+
 ### Future Phases (Planned)
 - Phase 6: Manual testing and validation (UI testing)
 - Phase 7: Documentation and cleanup
