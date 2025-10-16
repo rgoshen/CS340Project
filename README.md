@@ -26,6 +26,11 @@
     - [CRUD Module Code Example](#crud-module-code-example)
     - [Dashboard Usage](#dashboard-usage)
     - [Tests](#tests)
+      - [Running Unit Tests](#running-unit-tests)
+      - [Running Integration Tests](#running-integration-tests)
+    - [Code Quality \& Linting](#code-quality--linting)
+    - [Continuous Integration (CI/CD)](#continuous-integration-cicd)
+      - [Interactive Test Script Example](#interactive-test-script-example)
     - [Screenshots](#screenshots)
       - [Module Setup and Import](#module-setup-and-import)
       - [Test Data Setup](#test-data-setup)
@@ -45,6 +50,13 @@
       - [Delete Operation with Non-Matching Query (No Documents Deleted)](#delete-operation-with-non-matching-query-no-documents-deleted)
       - [Delete Multiple Documents](#delete-multiple-documents)
       - [Test Teardown - Cleanup Test Data](#test-teardown---cleanup-test-data)
+      - [Login Page](#login-page)
+      - [Invalid Login](#invalid-login)
+      - [Unfiltered Initial Table](#unfiltered-initial-table)
+      - [Unfilter Table With None Selected](#unfilter-table-with-none-selected)
+      - [Water Rescue Filter](#water-rescue-filter)
+      - [Mountain or Wilderness Rescue Filter](#mountain-or-wilderness-rescue-filter)
+      - [Disaster or Infividual Tracking Filter](#disaster-or-infividual-tracking-filter)
   - [Features](#features)
   - [Contact](#contact)
 
@@ -61,12 +73,14 @@ Grazioso Salvare needs an efficient way to identify dogs with the right characte
 This project follows a Model-View-Controller (MVC) architecture:
 
 **Model (Data Layer):**
+
 - MongoDB database (aac.animals collection)
 - AnimalShelter CRUD module (CRUD_Python_Module.py)
 - Data normalization functions (data_helpers.py)
 - Rescue filter logic (rescue_filters.py)
 
 **View (Presentation Layer):**
+
 - Interactive Dash/Plotly web dashboard (ProjectTwoDashboard.ipynb)
 - Authentication gate with login form
 - Filtered data table with sorting and pagination
@@ -74,6 +88,7 @@ This project follows a Model-View-Controller (MVC) architecture:
 - Pie chart showing outcome type distribution
 
 **Controller (Business Logic):**
+
 - Dash callbacks coordinating user interactions
 - Filter dispatchers applying rescue criteria
 - Authentication validation (dashboard_auth.py)
@@ -191,6 +206,8 @@ To get a local copy of this CRUD module up and running, follow these simple step
     jupyter notebook
     ```
 
+    ![start command](./screenshots/initial_start.jpg)
+
 **To run the CRUD module tests:**
 
 - Open `ProjectOneTestScript.ipynb` and run all cells
@@ -198,6 +215,9 @@ To get a local copy of this CRUD module up and running, follow these simple step
 **To run the interactive dashboard:**
 
 - Open `ProjectTwoDashboard.ipynb` and run the cell
+  ![select notebook](./screenshots/select_correct_notebook.jpg)
+  ![run notebook](./screenshots/run_book.jpg)
+  ![good output](./screenshots/no_error_output.jpg)
 - Login with credentials: `admin` / `grazioso2024`
 - Use rescue type filters to identify candidate animals
 - Click table rows to view animal locations on the map
@@ -351,6 +371,7 @@ The interactive dashboard provides a web-based interface for identifying rescue 
 ### Tests
 
 Testing for this CRUD module is performed using both:
+
 1. **Unit Tests** - Python unittest suite in `tests/` directory (recommended for development)
 2. **Interactive Tests** - ProjectOneTestScript.ipynb Jupyter Notebook (for demonstration)
 
@@ -359,6 +380,7 @@ Testing for this CRUD module is performed using both:
 The project includes a comprehensive unittest suite with 29 tests covering all CRUD operations:
 
 **With Live MongoDB Database (default):**
+
 ```bash
 # Requires MongoDB running on localhost:27017 with aacuser credentials
 
@@ -379,6 +401,7 @@ python -m unittest tests.test_crud.TestCreate.test_create_with_valid_data
 ```
 
 **With Mock Database (for CI/offline testing):**
+
 ```bash
 # No MongoDB connection required - uses mocked database
 
@@ -391,6 +414,7 @@ USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py" -v
 *Note: Mock database testing is currently in development. All 29 tests pass with live MongoDB.*
 
 **Test Structure:**
+
 - `tests/test_crud.py` - All CRUD operation tests (17 tests: Create, Read, Update, Delete)
 - `tests/test_authentication.py` - Authentication and connection tests (4 tests)
 - `tests/test_error_handling.py` - Error handling and edge case tests (8 tests)
@@ -399,6 +423,7 @@ USE_MOCK_DB=true python -m unittest discover -s tests -p "test_*.py" -v
 **Total: 29 tests, all passing**
 
 **Test Coverage:**
+
 ```bash
 # Run tests with coverage analysis
 pip install coverage
@@ -417,6 +442,7 @@ coverage html
 The project includes 7 integration tests for dashboard workflows that validate the complete data pipeline from database to filters to visualizations.
 
 **Running integration tests:**
+
 ```bash
 # Run all integration tests
 python -m unittest discover -s integration -p "test_*.py"
@@ -432,6 +458,7 @@ python -m unittest integration.test_dashboard_workflows.TestPrimaryWorkflow
 ```
 
 **Test Structure:**
+
 - `integration/test_dashboard_workflows.py` - Complete workflow integration tests (7 tests)
   - Primary workflow: Reset → Water → Mountain → Disaster (2 tests)
   - Authentication flow with state transitions (2 tests)
@@ -442,6 +469,7 @@ python -m unittest integration.test_dashboard_workflows.TestPrimaryWorkflow
 **Total: 7 integration tests, all passing**
 
 **What Integration Tests Cover:**
+
 - ✅ Complete data pipeline workflows (Database → Normalization → Filtering)
 - ✅ Primary filter sequence: Reset → Water → Mountain → Disaster
 - ✅ Filter results composition (correct sex, breed, age criteria)
@@ -461,6 +489,7 @@ Integration tests focus on **data pipeline correctness**, not UI rendering. The 
 - **Chart Visual Appearance**: Plotly chart rendering is validated by the library; we test data transformation correctness.
 
 **Testing Strategy:**
+
 - **Unit Tests (129 tests)**: Test individual functions in isolation (filters, normalization, bucketing, auth)
 - **Integration Tests (7 tests)**: Test complete workflows end-to-end with mock data
 - **Manual Testing**: Validate UI rendering, interactivity, and user experience in Jupyter
@@ -472,6 +501,7 @@ For detailed rationale on integration test scope, see the **Phase 6: Testing & V
 This project uses **ruff** for fast Python linting and code quality checks.
 
 **Running the linter:**
+
 ```bash
 # Check all Python files for issues
 ruff check .
@@ -487,12 +517,14 @@ ruff check --output-format=full .
 ```
 
 **Linting Configuration:**
+
 - Configuration file: `ruff.toml`
 - Target: Python 3.13
 - Line length: 79 characters (PEP 8)
 - Enabled rules: pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, flake8-bugbear
 
 **Pre-commit checks:**
+
 ```bash
 # Run linter before committing
 ruff check .
@@ -524,6 +556,7 @@ This project uses GitHub Actions for automated testing and code quality checks.
      - Upload coverage to Codecov
 
 **CI Environment:**
+
 - Python 3.13
 - Ubuntu latest
 - MongoDB 8.0 service container
@@ -540,6 +573,7 @@ The CI/CD workflows require two secrets to be configured in the repository:
    - `MONGODB_PASSWORD` - MongoDB password for testing
 
 **Why Secrets?**
+
 - Passwords never appear in code or workflow files
 - Easy to rotate credentials without code changes
 - Follows security best practices
@@ -548,6 +582,7 @@ The CI/CD workflows require two secrets to be configured in the repository:
 **Note:** Workflows will fail with authentication errors if secrets are not configured.
 
 **Viewing CI Results:**
+
 - Check the "Actions" tab in GitHub repository
 - PR checks must pass before merging to main
 - Coverage reports available in PR comments
@@ -662,6 +697,34 @@ print(f"Delete test removed {delete_count} record(s)")
 #### Test Teardown - Cleanup Test Data
 
 ![Test Teardown - Cleanup Test Data](./screenshots/test_teardown.jpg)
+
+#### Login Page
+
+![Login Page](./screenshots/login_page.jpg)
+
+#### Invalid Login
+
+![Invalid Login](./screenshots/invalid_login.jpg)
+
+#### Unfiltered Initial Table
+
+![Unfiltered Initial Table](./screenshots/unfiltered_table_initial.jpg)
+
+#### Unfilter Table With None Selected
+
+![Unfiltered Table with no selected](./screenshots/unfiltered_no_selection.jpg)
+
+#### Water Rescue Filter
+
+![Water Rescue Filter](./screenshots/water_rescue_filter.jpg)
+
+#### Mountain or Wilderness Rescue Filter
+
+![Mountain or Wilderness Rescue Filter](./screenshots/mountain_wilderness_filter.jpg)
+
+#### Disaster or Infividual Tracking Filter
+
+![Disaster or Infividual Tracking Filter](./screenshots/disaster_individual_filter.jpg)
 
 ## Features
 
